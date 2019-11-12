@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <link rel='stylesheet' href='./css/clubnode-style.css' />
+  </head>
+  <body>
+    <div id="gui" class='hide' >&nbsp;
+      <span id="skipIntro">true</span>
+    </div>
+
+    <div id='clubnode' class='show'>
+      <canvas id="clubnode-canvas" width="800" height="300"></canvas>
+    </div>
+    <label for='mp3file' class="mp3player hide">File</label>
+    <select id="mp3file" class="mp3player hide">
+      <option value=0 data-file='null' >none</option>
+      <option value=1 data-file='Santana_Europa.mp3' >Europa - Santana</option>
+      <option value=2 data-file='Santana_EvilWays.mp3'>Evil Ways - Santana</option>
+      <option value=3 data-file='Santana_Smooth.mp3'>Smooth - Santana</option>
+      <option value=4 data-file='Santana_CorazonEspinado.mp3'>Corazon Espinado - Santana</option>
+      <option value=5 data-file='Santana_BlackMagicWoman.mp3'>Black Magic Woman - Santana</option>
+      <option value=6 data-file='PowerStation_GetItOn.mp3'>Get it on - Power Station</option>
+      <option value=7 data-file='GoldenEaring_RadarLove.mp3'>Radar Love - Golden Earing</option>
+      <option value=8 data-file='SistersOfMercy_MotherRussia.mp3'>Mother Russia - Sisters of Mercy</option>
+      <option value=9 data-file='PeterGabriel_Sledgehammer.mp3'>Sledge Hammer - Peter Gabriel</option>
+      <option value=10 data-file='PeterGabriel_BigTime.mp3'>Big Time - Peter Gabriel</option>
+    </select>
+    <label for='visual-graph' class="mp3player hide">Visualizer</label>
+    <select id="visual-graph" class="mp3player hide">
+        <option value="-1" >All</option>
+        <option value="0"  >Cross Bars</option>
+        <option value="1"  >Symmetric Bars</option>
+        <option value="2"  >Dotted Peaks</option>
+        <option value="3"  >Inverted Bars</option>
+        <option value="4"  >Radial Bars</option>
+        <option value="5"  >Big Pulse</option>
+        <option value="6"  >Connected Particles</option>
+        <option value="7"  >Peaked Bars</option>
+        <option value="8"  >Life Line</option>
+        <option value="9" >Triangles</option>
+        <option value="10" >Sin Wave</option>
+        <option value="11" >Circled Peaks</option>
+    </select>
+    <label class="mp3player hide">IP Address</label>
+    <input class="mp3player hide" type='text' id='ipAddress' placeholder='000.000.000.000' value='127.0.0.1' />
+    <button class="mp3player hide " id='btnConnect'>Connect</button>
+    <button class="mp3player hide" id='btnStartMp3' >Start/Pause</button>
+    <div id='loadMsg' class='mp3player hide ' >&nbsp;</div>
+
+    <div id='mp3connect' class='hide' >
+      <div id="mp3gui" class='hide' >
+        <section id='visualizer' class=' '>
+          <div id='canvasCont'>
+            <canvas id="fft1" class='fft' width="1000" height="325"></canvas>
+            <canvas id="fft2" class='fft' width="1000" height="325"></canvas>
+          </div>
+        </section>
+     </div>
+      <div id='current-time'>&nbsp;</div>
+    </div>
+
+
+
+    <script type='text/javascript' src='./js/clubnode.js' ></script>
+  </body>
+</html>
