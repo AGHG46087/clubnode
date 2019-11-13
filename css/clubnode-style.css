@@ -1,0 +1,202 @@
+/*
+*
+*/
+html, body {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: #003;
+  text-align: center;
+  font-family: "trebuchet ms", 'Open Sans', arial, sans-serif;
+/*  width: 1024px; */
+  margin: 0 auto;
+}
+
+#gui {
+  background: rgba(0, 60, 60, 0.5);
+  padding: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+label {
+  color: #0aa;
+  font-size: 11px;
+  max-width: 60px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+select {
+  background: rgba(0, 0, 0, 0.5);
+  color: #0ff;
+  border-radius: 7px;
+  border: 0;
+  padding: 2px;
+  font-size: 13px
+}
+
+option {
+  background: #012;
+}
+
+a {
+  color: #259
+}
+#clubnode {
+  margin: auto 150px;
+}
+
+html body div#gui.hide {
+  visibility: hidden; /* maintain position on the display - just do not show it visually */
+}
+
+html body div#clubnode.hide,
+html body .mp3player.hide,
+html body div#mp3connect.hide  {
+  display: none;
+}
+div#mp3connect {
+  color: #FFFFFF;
+  margin: 0;
+}
+
+body > section {
+  display: flex;
+  -webkit-display: -webkit-flex;
+
+  flex-direction: column;
+  -webkit-flex-direction: column;
+
+  justify-content: center;
+  -webkit-justify-content: center;
+
+  align-content: center;
+  -webkit-align-content: center;
+
+  align-items: center;
+  -webkit-align-items: center;
+
+  box-sizing: border-box;
+  height: 100%;
+
+  perspective: 800px;
+  -webkit-perspective: 800px;
+
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+#loadMsg {
+  color: aquamarine;
+}
+#loadMsg.error {
+  color: #ff0000;
+}
+section {
+  position: relative;
+  top: 130px;
+  left: 455px; /* 530px;*/
+}
+
+section > * {
+  display: flex;
+  -webkit-display: -webkit-flex;
+  align-items: center;
+  -webkit-align-items: center;
+}
+
+section .fft {
+  position: absolute;
+  box-reflect: below 5px linear-gradient(top, transparent, transparent 50%, rgba(255, 255, 255, 0.4));
+  -webkit-box-reflect: below 5px -webkit-linear-gradient(top, transparent, transparent 50%, rgba(255, 255, 255, 0.4));
+}
+
+section.outline .fft {
+  border: 1px solid red;
+}
+
+#fft1 {
+  transform: translateX(-350px) rotateX(-35deg) rotateY(30deg);
+  -webkit-transform: translateX(-350px) rotateX(-35deg) rotateY(30deg);
+}
+
+#fft2 {
+  transform: translateX(-530px) rotateX(-35deg) rotateY(-30deg);
+  -webkit-transform: translateX(-530px) rotateX(-35deg) rotateY(-30deg);
+}
+
+#mp3gui.flat #fft1, #mp3gui.flat section {
+  transform: inherit;
+  -webkit-transform: inherit;
+  position: inherit;
+  margin: 0 auto;
+}
+
+#mp3gui.flat #fft2 {
+  display: none;
+}
+
+#myaudio {
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+#audio-player {
+  display: none;
+}
+
+#current-time {
+  font-size: 100px;
+  z-index: -1;
+  opacity: 0.5;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 -1px 0 rgba(0, 0, 0, 0.7);
+  color: transparent;
+  font-weight: 400;
+}
+
+@-webkit-keyframes msgalert {
+  from {
+    font-size: 100%;
+    background-color: #000000;
+  }
+  10% {
+    background-color: blue;
+    color: #FFFFFF;
+  }
+  90% {
+    color: orange;
+    background-color: crimson;
+  }
+  to {
+    font-size: 500%;
+    background-color: crimson;
+    color: yellow;
+  }
+}
+div#loadMsg.msg-alert {
+  -webkit-animation-duration: 1s;
+  -webkit-animation-name: msgalert;
+  -webkit-animation-iteration-count: 6;
+  -webkit-animation-direction: alternate;
+}
+
+button {
+  background: rgba(0, 0, 0, 0.5);
+  color: #0ff;
+  border-radius: 7px;
+  border: 0;
+  border-bottom: 1px solid cyan;
+  padding: 2px;
+  font-size: 13px;
+}
+input[type='text'] {
+  background: rgba(0, 0, 0, 0.5);
+  color: #0ff;
+  border-radius: 7px;
+  border: 1px solid cyan;
+  padding: 2px;
+  font-size: 13px;
+
+}
