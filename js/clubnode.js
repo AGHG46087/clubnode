@@ -69,6 +69,41 @@ var mp3player = {
     }, 3000 );
   },
   
+  /* loadMp3File: When a mp3 is being loaded this will load a audio file, setup event listeners, and connect analyser */
+  loadMp3File: function ( url, keepTitle ) {
+    var elMsg = document.getElementById( 'loadMsg' );
+    elMsg.innerHTML = 'loading ' + url + ' ...';
+    setTimeout(function() { if (!keepTitle) { elMsg.innerHTML = '&nbsp;'; } }, 2000);
+
+    if ( window.audio || mp3player.audioPlaying ) {
+      mp3player.resetLifeUniverseAndEverything();
+    }
+
+    window.audio = new Audio();
+    window.audio.id='audio-player';
+    window.audio.controls = true;
+    window.audio.loop = false;
+    audio.src = url;
+
+    var el = document.getElementById('visualizer' );
+    el.appendChild(audio);
+    mp3player.setupAudioListeners();
+
+    if( !mp3player.audioCtx ) {
+      mp3player.audioCtx = new AudioContext();
+    }
+    mp3player.analyser = mp3player.audioCtx.createAnalyser();
+    // Setting of the FFT size must be power of 2,  set the appropriate value to mp3player.fftSize
+    if (( 512 <= mp3player.fftSize && mp3player.fftSize < 2048 ) && ((n & (n - 1)) == 0 ) ) {
+      mp3player.analyser.fftSize = mp3player.fftSize;
+    }
+
+    mp3player.source = mp3player.audioCtx.createMediaElementSource(audio);
+    mp3player.source.connect(mp3player.analyser);
+    mp3player.analyser.connect(mp3player.audioCtx.destination);
+
+  },
+  
 };
 
   function ParticleEl( i ) {
