@@ -195,4 +195,77 @@
   //init the page.
   init();
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// Kicks off the program start on Window load Event being fired.
+// The first function fired is the init() function nested in the onload()
+window.onload = function () {
+
+  // The ALL_CAPS variables are intended as constants. Change them to change the behavior of the animations
+
+  if ( typeof AudioContext !== "undefined" ) {
+    console.log( 'Supported AudioContext()' );
+  } else if ( typeof webkitAudioContext !== "undefined" ) {
+    console.log( 'Supported webkitAudioContext()' );
+  } else {
+    alert( 'AudioContext not supported. :(' );
+    throw new Error( 'AudioContext not supported. :(' );
+  }
+
+
+  var QUALITY_TO_FONT_SIZE = [10, 20, 50, 100, 200, 350];
+  var QUALITY_TO_SCALE = [20, 14, 6, 3, 1.5, 0.9];
+  var QUALITY_TO_TEXT_POS = [10, 18, 43, 86, 170, 280];
+
+  /* trembling + blur = fun */
+  var TREMBLING = 0;
+  /* 0 - infinity */
+  var FANCY_FONT = "arial";
+  var BACKGROUND = "#001"; // 003
+  var BLENDING = true;
+  /* set false if you prefer rectangles */
+  var ARC = false;
+  /* play with these values */
+  var BLUR = false;
+  var PULSATION = true;
+  var PULSATION_PERIOD = 500;
+  var PARTICLE_RADIUS = 5;
+
+  /* disable blur before using blink */
+  var BLINK = false;
+  var GLOBAL_PULSATION = false;
+  var QUALITY = 2;
+  /* 0 - 5 */
+
+  document.body.style.backgroundColor = BACKGROUND;
+  var titles = ['club', 'nerd!', 'Club', 'Node!'];
+  var itercount = 0;
+  var interval_positions = null;
+  var interval_draw = null;
+
+
+  var canvas = document.getElementById( "clubnode-canvas" );
+  var ctx = canvas.getContext( "2d" );
+
+  var W = canvas.width;
+  var H = canvas.height;
+
+  var tcanvas = document.createElement( "canvas" );
+  var tctx = tcanvas.getContext( "2d" );
+  tcanvas.width = W;
+  tcanvas.height = H;
+
+
+  var total_area = W * H;
+  var total_particles = 2000;
+  var single_particle_area = total_area / total_particles;
+  var area_length = Math.sqrt( single_particle_area );
+  console.log( 'Window.onload(): Area length of ClubNode canvas ' + area_length );
+
+  var particles = [];
+  for ( var i = 1; i <= total_particles; i++ ) {
+    particles.push( new ParticleEl( i ) );
+  }
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////
