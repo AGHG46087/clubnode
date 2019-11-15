@@ -203,6 +203,25 @@ var mp3player = {
       mp3player.connection.send(data);
     }
   },
+  /* animationFrameCallback:  This is the function that is called 60fps pulls fft data, invokes methods to send data and draw */
+  animationFrameCallback: function() {
+    mp3player.animationFrame = window.requestAnimationFrame(mp3player.animationFrameCallback); // CALLBACK AGAIN
+
+    var freqByteData = new Uint8Array(mp3player.analyser.frequencyBinCount);
+    mp3player.analyser.getByteFrequencyData(freqByteData);
+
+    // send the data to external source
+    mp3player.sendData(freqByteData);
+
+    // draw on the canvas, save state, clear rectangle, draw, restore state.
+    mp3player.ctx1.globalCompositeOperation = 'source-over';
+    mp3player.ctx1.save();
+    mp3player.ctx1.clearRect(0,0, mp3player.canvasWidth, mp3player.canvasHeight);
+    mp3player.ctx2.clearRect(0,0, mp3player.canvasWidth, mp3player.canvasHeight);
+    mp3player.patterns[mp3player.patternIndex](freqByteData); // here is the drawing method
+    mp3player.ctx1.restore();
+
+  },
        
 };
 
