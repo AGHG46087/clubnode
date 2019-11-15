@@ -155,6 +155,48 @@ var mp3player = {
     setTimeout(function() { elMsg.innerHTML = '&nbsp;'; }, 2000);
   },
   
+  /* connectSocket: requests a Web socket connection and setup listeners on the socket */
+  connectSocket: function(url) {
+    console.log('Requesting to connect to url=['+url+']');
+    var elMsg = document.getElementById( 'loadMsg' );
+    window.WebSocket = window.WebSocket || window.MozWebSocket;
+    mp3player.connection = new WebSocket(url); //'ws://127.0.0.1:1234'
+
+    // connection is opened and ready to use
+    mp3player.connection.onopen = function () {
+      elMsg.innerHTML = 'Open socket connection to ' + url + ' ...';
+      setTimeout(function() { elMsg.innerHTML = '&nbsp;'; }, 2000);
+      console.log('%cmp3player.connectSocket,onopen(): Connection established to url=['+url+']', "color:cyan; background:blue; font-size: 12px");
+    };
+    // connection is opened and ready to use
+    mp3player.connection.onmessage = function (evt) {
+      var tempData = evt.data;
+      if ( tempData.indexOf('Build-break') > -1 ) {
+        console.log('%cmp3player.connectSocket.onmessage(): Build Break msg: %s', "color:yellow; background:red; font-size: 16px", tempData);
+        mp3player.notifyBuildBreak(tempData);
+      } else {
+        console.log('%cmp3player.connectSocket,onmessage(): Message received msg=[%s]', "color:white; background:blue; font-size: 12px", tempData);
+      }
+    };
+    // connection is opened closed
+    mp3player.connection.onclose = function () {
+      if( !utils.hasClass('error', elMsg) ) {
+        elMsg.innerHTML = 'Closed socket to ' + url + ' ...';
+        setTimeout(function() { elMsg.innerHTML = '&nbsp;'; }, 2000);
+      }
+      console.log('%cmp3player.connectSocketonclose(): Server requested Connection to url=['+url+'] closed for business', "color:orange; background:blue; font-size: 12px");
+      mp3player.connection = null;
+    };
+    // an error occurred when sending/receiving data
+    mp3player.connection.onerror = function (error) {
+      utils.addClass('error', elMsg);
+      elMsg.innerHTML = 'WebSocket Error: to '+ url +' ... Check Connection!!';
+      setTimeout(function() { utils.removeClass('error', elMsg); elMsg.innerHTML = '&nbsp;'; }, 2000);
+      console.log('%cmp3player.connectSocket.onerror(): An Error ocurred when sending/receiving data=['+error+']', "color:yellow; background:red; font-size: 16px");
+    };
+  },
+
+      
 };
 
   function ParticleEl( i ) {
