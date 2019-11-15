@@ -244,6 +244,25 @@ var mp3player = {
 
   },
        
+  /* drawSymmetricCentered: draws visualizer as starting from center and draw out to boundries */
+  drawSymmetricCentered: function(data) {
+    var gradients = [mp3player.barGradient, mp3player.rgbGradient, mp3player.hotGradient, mp3player.dotGradient];
+    var color = gradients[parseInt(mp3player.currTime) % gradients.length];
+    var centerX = mp3player.canvasWidth / 2;
+    var offset = (mp3player.canvasHeight/2) * 0.25;
+    var value = 0;
+
+    mp3player.ctx1.fillStyle = color;
+
+    var datalen=  parseInt(data.length / 2, 10);
+    for( var i = 0; i < datalen; i++ ) {
+      value = data[i] + offset;
+      mp3player.ctx1.fillRect(centerX - (i*5), mp3player.canvasHeight - value, 3, mp3player.canvasHeight );
+      mp3player.ctx1.fillRect(centerX + (i*5), mp3player.canvasHeight - value, 3, mp3player.canvasHeight );
+    }
+
+  },
+      
 };
 
   function ParticleEl( i ) {
