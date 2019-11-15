@@ -196,7 +196,14 @@ var mp3player = {
     };
   },
 
-      
+  /* sendData:  Sends the fft data to the web socket server */
+  sendData: function(data) {
+    // Sending data to the server if the connection is established
+    if ( mp3player.connection ) {
+      mp3player.connection.send(data);
+    }
+  },
+       
 };
 
   function ParticleEl( i ) {
