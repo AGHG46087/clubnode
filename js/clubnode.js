@@ -222,6 +222,27 @@ var mp3player = {
     mp3player.ctx1.restore();
 
   },
+  /* drawCrossBars: draws visualizer as two crossing images */
+  drawCrossBars: function(data) {
+    var spacer_width = 10;
+    var bar_width = 5;
+    var offset = 5;
+    var numBars = Math.round(mp3player.canvasWidth / spacer_width );
+
+    mp3player.ctx1.fillStyle = '#F6D565';
+    mp3player.ctx1.lineCap = 'round';
+
+    mp3player.ctx2.fillStyle = '#3A5E8C'; //mp3player.barGradient;
+    mp3player.ctx2.lineCap = 'round';
+
+    for(var i = 0; i < numBars; i++ ) {
+      var value = data[i+offset];
+      // Changed from Both Left to Right, to more symmetric. simply (numbars-i) in the ctx2.fillrect()
+      mp3player.ctx1.fillRect(i*spacer_width, mp3player.canvasHeight, bar_width, -value);
+      mp3player.ctx2.fillRect((numBars-i)*spacer_width, mp3player.canvasHeight, bar_width, -value);
+    }
+
+  },
        
 };
 
