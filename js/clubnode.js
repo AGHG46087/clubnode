@@ -103,6 +103,37 @@ var mp3player = {
     mp3player.analyser.connect(mp3player.audioCtx.destination);
 
   },
+  /* resetLifeUniverseAndEverything: Everything is stopped for a reason, reset all variables to inital state */
+  resetLifeUniverseAndEverything: function() {
+    // Stop the Audio player and remove listeners
+    window.audio.pause();
+    window.audio.removeEventListener('timeupdate');
+    window.audio.removeEventListener('ended');
+
+    mp3player.audioPlaying = false;
+
+    // Clear the Animation Frame and pattern switching interval
+    window.cancelAnimationFrame(mp3player.animationFrame);
+    clearInterval(mp3player.patternInterval);
+
+
+    // Clear the Canvas elements
+    mp3player.ctx1.clearRect(0,0, mp3player.canvasWidth, mp3player.canvasHeight);
+    mp3player.ctx2.clearRect(0,0, mp3player.canvasWidth, mp3player.canvasHeight);
+
+    mp3player.patternIndex = mp3player.PATTERN_START_INDEX;
+    mp3player.toggleCanvasOrientation();
+
+    try {
+      // Remove the existing Audio element from the DOM
+      var parent = document.getElementById( 'visualizer' );
+      parent.removeChild( window.audio );
+    } catch(e) {
+      console.log('%cFailed to remove audio node from visualizer, it is not present:', "color:orange; background:blue; font-size: 12px");
+    }
+    // window.audio = null;
+
+  },
   
 };
 
