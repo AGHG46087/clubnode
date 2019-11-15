@@ -1,4 +1,32 @@
 
+var mp3player = {
+  canvas1: document.getElementById( 'fft1' ),
+  canvas2: document.getElementById( 'fft2' ),
+  ctx1: null,
+  ctx2: null,
+  currTime: 0,
+  animationFrame: null,
+  audioCtx: null,
+  analyser: null,
+  source: null,
+  fftSize: 2048,
+  barGradient: null, // init(), drawPulse, drawLifeLine, drawSinWave, drawSymmetricCentered
+  rgbGradient: null, // init(), drawSymmetricCentered,
+  hotGradient: null, // init(), drawSymmetricCentered
+  dotGradient: null, // init(), drawDots, drawRadialBars, drawSymmetricCentered
+  pulseGradient: null, // init(), drawRadialBars, drawBigPulse
+  canvasHeight: 0,
+  canvasWidth: 0,
+  audioPlaying: false,
+  patterns: [],
+  patternIndex: 3,
+  patternInterval: 0,
+  connection: null,
+  PATTERN_CYCLE_ALL: true,
+  PATTERN_START_INDEX: 0, // max is patterns.length -1
+
+};
+
   function ParticleEl( i ) {
     this.r = Math.round( Math.random() * 255 | 0 );
     this.g = Math.round( Math.random() * 255 | 0 );
