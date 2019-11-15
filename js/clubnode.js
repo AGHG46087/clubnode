@@ -1,4 +1,49 @@
 
+  function ParticleEl( i ) {
+    this.r = Math.round( Math.random() * 255 | 0 );
+    this.g = Math.round( Math.random() * 255 | 0 );
+    this.b = Math.round( Math.random() * 255 | 0 );
+    this.alpha = 1;
+
+    this.x = (i * area_length) % W;
+    this.y = (i * area_length) / W * area_length;
+
+
+    /* randomize delta to make particles sparkling */
+    this.deltaOffset = Math.random() * PULSATION_PERIOD | 0;
+
+    this.radius = 0.2 + Math.random() * 2;
+  }
+
+  var positions = [];
+
+  function new_positions() {
+    tctx.fillStyle = "white";
+    tctx.fillRect( 0, 0, W, H );
+    tctx.fill();
+
+    tctx.font = "bold " + QUALITY_TO_FONT_SIZE[QUALITY] + "px " + FANCY_FONT;
+    var text = titles[itercount % titles.length]; // String(Math.random()).substr(-3);
+    itercount++;
+
+    tctx.strokeStyle = "black";
+    tctx.strokeText( text, (QUALITY + 1) * 5, QUALITY_TO_TEXT_POS[QUALITY] );
+
+    var image_data = tctx.getImageData( 0, 0, W, H );
+    var pixels = image_data.data;
+    positions = [];
+    for ( var i = 0; i < pixels.length; i = i + 4 ) {
+      if ( pixels[i] != 255 ) {
+        var position = {
+          x: (i / 4 % W | 0) * QUALITY_TO_SCALE[QUALITY] | 0, y: (i / 4 / W | 0) * QUALITY_TO_SCALE[QUALITY] | 0
+        };
+        positions.push( position );
+      }
+    }
+
+    get_destinations();
+  }
+
   function draw() {
 
     var now = Date.now();
