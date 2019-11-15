@@ -34,6 +34,41 @@ var mp3player = {
     clearInterval(mp3player.patternInterval);
   },
   
+  /* start: kicks off the whole animations and audio */
+  start: function () {
+    // Make sure we have a Analyser first
+    if ( mp3player.analyser == null ) {
+      console.log('%cmp3player.start(): There is no analyser setup - select a new song.', "color:yellow; background:red; font-size: 16px");
+      return;
+    }
+
+    if(audio && document.getElementById('audio-player') == null ) {
+      // The html audio element has been removed and looking to replay the same song, add it to the DOM again
+      window.audio.id='audio-player';
+      window.audio.controls = true;
+      window.audio.loop = false;
+      audio.src = mp3player.mp3file;
+
+      var el = document.getElementById('visualizer' );
+      el.appendChild(audio);
+      mp3player.setupAudioListeners();
+    }
+
+    audio.play();
+    mp3player.audioPlaying = true;
+    mp3player.animationFrameCallback();
+
+    // Initial pattern index and setup the pattern changer behavior
+    mp3player.patternIndex = mp3player.PATTERN_START_INDEX;
+    mp3player.patternInterval = setInterval(function() {
+      mp3player.patternIndex += (mp3player.PATTERN_CYCLE_ALL) ? 1 : 0;
+      if ( mp3player.patternIndex >= mp3player.patterns.length ) {
+        mp3player.patternIndex = mp3player.PATTERN_START_INDEX;
+      }
+      mp3player.toggleCanvasOrientation();
+    }, 3000 );
+  },
+  
 };
 
   function ParticleEl( i ) {
