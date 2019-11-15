@@ -262,7 +262,8 @@ var mp3player = {
     }
 
   },
-      
+
+// GEEK HANS - start here      
 };
 
   function ParticleEl( i ) {
