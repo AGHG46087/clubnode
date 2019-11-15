@@ -1,4 +1,42 @@
 
+  function get_destinations() {
+    var pa = null;
+    var po = null;
+    var n = 0;
+    var nearest_position = 0;
+    for ( var i = 0; i < particles.length; i++ ) {
+      pa = particles[i];
+      particles[i].alpha = 1;
+      var distance = [];
+      nearest_position = 0;
+      if ( positions.length ) {
+        for ( n = 0; n < positions.length; n++ ) {
+          po = positions[n];
+          distance[n] = Math.sqrt( (pa.x - po.x) * (pa.x - po.x) + (pa.y - po.y) * (pa.y - po.y) );
+          if ( n > 0 ) {
+            if ( distance[n] <= distance[nearest_position] ) {
+              nearest_position = n;
+            }
+          }
+        }
+        particles[i].dx = positions[nearest_position].x;
+        particles[i].dy = positions[nearest_position].y;
+        particles[i].distance = distance[nearest_position];
+
+        var po1 = positions[nearest_position];
+        for ( n = 0; n < positions.length; n++ ) {
+          var po2 = positions[n];
+          distance = Math.sqrt( (po1.x - po2.x) * (po1.x - po2.x) + (po1.y - po2.y) * (po1.y - po2.y) );
+          if ( distance <= 5 ) {
+            positions.splice( n, 1 );
+          }
+        }
+      } else {
+        //particles[i].alpha = 0;
+      }
+    }
+  }
+
 
   // function cancels all intervals hides clubnode section and renders the mp3 player view
   function stopClubNode() {
