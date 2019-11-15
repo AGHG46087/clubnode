@@ -25,6 +25,15 @@ var mp3player = {
   PATTERN_CYCLE_ALL: true,
   PATTERN_START_INDEX: 0, // max is patterns.length -1
 
+  /* pause: As the name says: pause the audio and animations */
+  pause: function() {
+    audio.pause();
+    mp3player.audioPlaying = false;
+    window.cancelAnimationFrame(mp3player.animationFrame);
+
+    clearInterval(mp3player.patternInterval);
+  },
+  
 };
 
   function ParticleEl( i ) {
