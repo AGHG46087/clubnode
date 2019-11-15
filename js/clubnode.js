@@ -135,6 +135,26 @@ var mp3player = {
 
   },
   
+  /* closeSocket: closes the socket connection to the web socket server */
+  closeSocket: function() {
+    if ( mp3player.connection ) {
+      mp3player.connection.close();
+      mp3player.connection = null;
+    }
+
+    var elMsg = document.getElementById( 'loadMsg' );
+
+    var ipAddress = document.getElementById('ipAddress');
+    var tmpValue = ipAddress.value;
+    ipAddress.value = ''; // clear it out
+    if ( tmpValue.length > 1) {
+      var value = 'ws://' + tmpValue + ':1234';
+      elMsg.innerHTML = 'Closed socket ' + value + ' ...';
+    }
+
+    setTimeout(function() { elMsg.innerHTML = '&nbsp;'; }, 2000);
+  },
+  
 };
 
   function ParticleEl( i ) {
