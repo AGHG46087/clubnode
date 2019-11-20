@@ -1020,6 +1020,23 @@ var mp3player = {
   },
 
 
+  /* setupPatterns: places all the patterns into an array that will be cycled through at playtime  */
+  setupPatterns: function () {
+    mp3player.patterns.push(mp3player.drawCrossBars);          // 0
+    mp3player.patterns.push(mp3player.drawSymmetricCentered);  // 1
+    mp3player.patterns.push(mp3player.drawDots);               // 2
+    mp3player.patterns.push(mp3player.drawInvertedBars);       // 3
+    mp3player.patterns.push(mp3player.drawRadialBars);         // 4
+    mp3player.patterns.push(mp3player.drawBigPulse);           // 5
+    mp3player.patterns.push(mp3player.drawConnectedParticles); // 6
+    mp3player.patterns.push(mp3player.drawPeakedBars);         // 7
+    mp3player.patterns.push(mp3player.drawLifeLine);           // 8
+    mp3player.patterns.push(mp3player.drawTriangles);          // 9
+    mp3player.patterns.push(mp3player.drawSinWave);            // 10
+    mp3player.patterns.push(mp3player.drawRadialPeaks);        // 11
+  },
+
+
 // GEEK HANS - start here
 };
 
