@@ -396,6 +396,39 @@ var peakedBarsState = {
   }
 };
 
+var radialBarsState = {
+  arcSize: 18,
+  arcs: [],
+  dots: [],
+  colors: ['5,223,230', '0,47,229', '234,102,26', '11,231,70', '248,51,9', '157, 193, 243', '245, 232, 153', '226, 51, 110', '206,233,20', '233,180,23',  '241,90,17'],
+  initialized: false,
+
+  init: function(width, height) {
+    var arcCount = 60;
+    radialBarsState.width = width;
+    radialBarsState.height = height;
+    radialBarsState.arcs.length = 0; // empty the array
+    radialBarsState.dots.length = 0; // empty the array
+    for( var i = 0; i < arcCount; i++ ) {
+      radialBarsState.dots[i] = 0;
+      radialBarsState.arcs[i] = {
+        startAngle: 0,
+        endAngle: 0,
+        h: 0,
+        color: radialBarsState.colors[utils.intRandom(0, i* radialBarsState.colors.length) % radialBarsState.colors.length]
+      }
+    }
+
+    radialBarsState.initialized = true;
+  },
+  randomizeColors: function() {
+    var arc;
+    for( var i = 0; i < radialBarsState.arcs.length; i++ ) {
+      arc = radialBarsState.arcs[i];
+      arc.color = radialBarsState.colors[utils.intRandom(0, i* radialBarsState.colors.length) % radialBarsState.colors.length];
+    }
+  }
+};
 
 
 // GEEK HANS - start here      
