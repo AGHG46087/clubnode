@@ -1049,6 +1049,41 @@ var mp3player = {
 
   },
 
+  /* windowResizeHandler: The Window has resize event - make adjustments */
+  windowResizeHandler: function() {
+    var tHeight = parseInt(window.innerHeight * 0.60) + '';
+    var tWidth = parseInt(window.innerWidth) + '';
+
+    var fftel = document.getElementById('fft1');
+    fftel.setAttribute('height', tHeight);
+    fftel.setAttribute('width', tWidth);
+    fftel = document.getElementById('fft2');
+    fftel.setAttribute('height', tHeight);
+    fftel.setAttribute('width', tWidth);
+
+    var style = ( window.getComputedStyle ) ? window.getComputedStyle( mp3player.canvas1 ) :  mp3player.canvas1.currentStyle;
+    mp3player.canvasHeight = parseInt( style.height, 10 );
+    mp3player.canvasWidth = parseInt( style.width, 10 );
+
+    try {
+      peakedBarsState.init(mp3player.canvasWidth, mp3player.canvasHeight);
+      connectedParticlesState.init(mp3player.canvasWidth, mp3player.canvasHeight);
+      sinWaveState.init(mp3player.ctx1, mp3player.canvasWidth, mp3player.canvasHeight);
+      // setup gradient colors
+      mp3player.barGradient = mp3player.getBarGradient();
+      mp3player.hotGradient = mp3player.getBarGradient2();
+      mp3player.rgbGradient = mp3player.getBarGradient3();
+      mp3player.dotGradient = mp3player.getDotGradient();
+      mp3player.pulseGradient = mp3player.getCircleGradient();
+
+    } catch(exc) {
+      // Context of canvas may not yet be set
+      console.log('Exception in resize of Window: Context of canvas may be null here: ' + exc);
+    }
+
+    console.log( 'mp3player.windowResizeHandler(): width=[' + mp3player.canvasWidth + '], height=[' + mp3player.canvasHeight + ']' );
+
+  },
 
 
 // GEEK HANS - start here
