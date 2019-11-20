@@ -1164,6 +1164,17 @@ var mp3player = {
     mp3player.sendData('ACK: ' + msg);
     console.log( 'notifyBuildBreak(): mp3 file to be loaded: ' + soundFile );
   },
+  /* getDotGradient: gradient color */
+  getDotGradient: function () {
+    if (!mp3player.ctx1 ) { return; }
+    var grad = mp3player.ctx1.createLinearGradient( 0, 0, 0, mp3player.canvasHeight );
+    grad.addColorStop( 1, '#002FE5' );
+    grad.addColorStop( 0.50, '#CEE914' );
+    grad.addColorStop( 0.25, '#F16011' );
+    grad.addColorStop( 0, '#FF0000' );
+
+    return grad;
+  },
 
 
 
