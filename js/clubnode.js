@@ -491,7 +491,7 @@ var lifeLineState = {
         lifeLineState.color.bD = 1;
       }
     }
-  }
+  },
 };
 
 
