@@ -516,6 +516,46 @@ var triangleState = {
 
 };
                 
+var sinWaveState = {
+  sinAngle: [],
+  line: [],
+  len: 512 / 2 - 20, // smallest fft size
+  color: 0,
+  initialized: false,
+
+  sinWaveColor: function(context, width, height) {
+    if ( !context ) { return; }
+    sinWaveState.color = context.createLinearGradient(0, 0, 0, height);
+    sinWaveState.color.addColorStop(0.1, '#ff5614');
+    sinWaveState.color.addColorStop(0.3, '#fffa47');
+    sinWaveState.color.addColorStop(0.4, '#f93b04');
+    sinWaveState.color.addColorStop(0.5, '#f93b04');
+    sinWaveState.color.addColorStop(0.6, '#fffa47');
+    sinWaveState.color.addColorStop(0.7, '#f93b04');
+    sinWaveState.color.addColorStop(0.75, '#f01800');
+    sinWaveState.color.addColorStop(0.8, '#fb7220');
+    sinWaveState.color.addColorStop(0.9, '#f93b04');
+    sinWaveState.color.addColorStop(1, '#f01800');
+  },
+  init: function(context, width, height) {
+    var angleGap = Math.random() * 0.01 + 0.05,
+      angle = 0;
+
+    sinWaveState.sinAngle.length = 0;
+    sinWaveState.sinAngle[0] = Math.sin(angle);
+    for ( var i = 1; i < sinWaveState.len; i++ ) {
+      sinWaveState.sinAngle[i] = Math.sin(angle);
+      if((sinWaveState.sinAngle[i-1] > 0 && sinWaveState.sinAngle[i] < 0) ||
+         (sinWaveState.sinAngle[i-1] < 0 && sinWaveState.sinAngle[i] > 0)) {
+        angleGap = Math.random() * 0.01 + 0.05;
+      }
+      angle += angleGap;
+    }
+    sinWaveState.sinWaveColor(context, width, height);
+    sinWaveState.initialized = true;
+  }
+};
+                
 // GEEK HANS - start here
                 
   function ParticleEl( i ) {
