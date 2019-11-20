@@ -739,6 +739,37 @@ var mp3player = {
     }
   },
 
+  /* drawPeakedBars: draws visualizer as a bars with peaked decaying points */
+  drawPeakedBars: function(data) {
+    var stateVars = peakedBarsState;
+    var total = 0, b, iData, barHeight;
+    var offset = (mp3player.canvasHeight > 400 ) ? (mp3player.canvasHeight/2) * 0.25 : 0;
+
+
+    for (var i = 0; i < stateVars.barSize; i++) {
+      iData = i + 128;
+      b = stateVars.bars[i];
+      if (b.h == 0) {
+        b.h = data[iData] + offset;
+      } else {
+        if (b.h < data[iData]) {
+          b.h += Math.floor((data[iData] - b.h) / 2);
+        } else {
+          b.h -= Math.floor((b.h - data[iData]) / 1.2);
+        }
+      }
+      b.h *= 1.7;
+      barHeight = mp3player.canvasHeight/3;
+      mp3player.ctx1.fillStyle = 'rgba(' + b.color + ', 0.8)';
+      mp3player.ctx1.fillRect(b.x, mp3player.canvasHeight - b.h, b.w, barHeight);
+
+      stateVars.dots[i] = (stateVars.dots[i] < b.h) ? b.h : stateVars.dots[i]-1;
+
+      mp3player.ctx1.fillStyle = mp3player.ctx1.fillStyle.replace('0.8)', '0.5)');
+      mp3player.ctx1.fillRect(b.x, mp3player.canvasHeight - stateVars.dots[i]- b.w , b.w, b.w);
+      total += data[iData];
+    }
+  },
   
 // GEEK HANS - start here
 };
