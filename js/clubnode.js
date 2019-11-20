@@ -397,6 +397,7 @@ var peakedBarsState = {
 };
 
 
+
 // GEEK HANS - start here      
                 
   function ParticleEl( i ) {
