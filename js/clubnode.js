@@ -276,7 +276,15 @@ var mp3player = {
     }
     element.className = cn + classname;
   },
-      
+  /* remove a class from an element */
+  removeClass: function ( classname, element ) {
+    var cn = element.className;
+    var rxp = new RegExp( "\\s?\\b" + classname + "\\b", "g" );
+    cn = cn.replace( rxp, '' );
+    element.className = cn;
+  },
+    
+
 // GEEK HANS - start here      
 };
 
