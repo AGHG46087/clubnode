@@ -1207,7 +1207,29 @@ var mp3player = {
     var grad = ctx.createLinearGradient( 0, 0, 0, mp3player.canvasHeight );
     // Compute Gradient colors
     // http://www.perbang.dk/rgbgradient/
+    /*
+    grad.addColorStop(0.14, '#FF0000');
+    grad.addColorStop(0.285714286, '#FF7F00');
+    grad.addColorStop(0.428571429, '#FFFF00');
+    grad.addColorStop(0.571428571, '#00FF00');
+    grad.addColorStop(0.714285714, '#0000FF');
+    grad.addColorStop(0.857142857, '#4B0082');
+    grad.addColorStop(1.0, '#8F00FF');
+    */
+    grad.addColorStop( 1.00, '#002FE5' ); // BOTTOM
+    grad.addColorStop( 0.90, '#05DFE6' );
+    grad.addColorStop( 0.80, '#0BE746' );
+    grad.addColorStop( 0.70, '#CEE914' );
+    grad.addColorStop( 0.60, '#E9B417' );
+    grad.addColorStop( 0.50, '#EAB417' );
+    grad.addColorStop( 0.40, '#EA661A' );
+    grad.addColorStop( 0.30, '#F15A11' );
+    grad.addColorStop( 0.20, '#F16011' );
+    grad.addColorStop( 0.10, '#F83309' );
+    grad.addColorStop( 0.00, '#FF0000' ); // top
 
+    return grad;
+  },
     /*
     grad.addColorStop(0.14, '#FF0000');
     grad.addColorStop(0.285714286, '#FF7F00');
