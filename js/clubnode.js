@@ -1036,6 +1036,20 @@ var mp3player = {
     mp3player.patterns.push(mp3player.drawRadialPeaks);        // 11
   },
 
+  /* toggleCanvasOrientation: When the pattern changes, assure the proper CSS class are applied */
+  toggleCanvasOrientation: function() {
+    var gui = document.getElementById('mp3gui');
+    var classPresent = utils.hasClass('flat', gui);
+    if ( mp3player.patternIndex === 0 && classPresent ) {
+      utils.removeClass('flat', gui);
+    }
+    else if ( mp3player.patternIndex > 0 && !classPresent ) {
+      utils.addClass('flat', gui);
+    }
+
+  },
+
+
 
 // GEEK HANS - start here
 };
