@@ -1175,6 +1175,31 @@ var mp3player = {
 
     return grad;
   },
+  /* getCircleGradient: gradient color */
+  getCircleGradient: function () {
+    if (!mp3player.ctx1 ) { return; }
+    var ctx = mp3player.ctx1,
+      centerX = mp3player.canvasWidth/ 2,
+      centerY = mp3player.canvasHeight/2;
+
+    var grad = ctx.createRadialGradient(centerX, centerY, 1, centerX, centerY, mp3player.canvasHeight/3 ); // 100
+    // Compute Gradient colors
+    // http://www.perbang.dk/rgbgradient/
+
+    grad.addColorStop( 0.00, '#002FE5' ); // BOTTOM
+    grad.addColorStop( 0.10, '#05DFE6' );
+    grad.addColorStop( 0.20, '#0BE746' );
+    grad.addColorStop( 0.30, '#CEE914' );
+    grad.addColorStop( 0.40, '#E9B417' );
+    grad.addColorStop( 0.50, '#EAB417' );
+    grad.addColorStop( 0.60, '#EA661A' );
+    grad.addColorStop( 0.70, '#F15A11' );
+    grad.addColorStop( 0.80, '#F16011' );
+    grad.addColorStop( 0.90, '#F83309' );
+    grad.addColorStop( 1.00, '#FF0000' ); // top
+
+    return grad;
+  },
 
 
 
