@@ -1101,6 +1101,49 @@ var mp3player = {
       currentTimeNode.innerHTML = '&nbsp;';
     });
   },
+  /* setupControlListeners: listeners on the control elements */
+  setupControlListeners: function () {
+    document.getElementById('mp3file').addEventListener('change', function () {
+      mp3player.mp3file = null;
+      if ( this.value > 0 ) {
+        mp3player.mp3file = './music/' + this[this.value].getAttribute( 'data-file' );
+        console.log( 'setupControlListeners.addEventListener(): mp3 file to be loaded: ' + mp3player.mp3file );
+        mp3player.loadMp3File( mp3player.mp3file );
+      }
+    });
+    document.getElementById('visual-graph').addEventListener('change', function() {
+      var value = parseInt(this.value);
+      mp3player.PATTERN_CYCLE_ALL = (value === -1);
+      mp3player.PATTERN_START_INDEX = (mp3player.PATTERN_CYCLE_ALL) ? 0 : value;
+      mp3player.patternIndex = mp3player.PATTERN_START_INDEX;
+      mp3player.toggleCanvasOrientation();
+      //console.log('setupControlListeners.addEventListener(): Visual-Graph drop down: Cycle All Patterns=['+mp3player.PATTERN_CYCLE_ALL+'], index=['+mp3player.PATTERN_START_INDEX+']=['+this[value+1].label+']. ');
+    });
+    document.getElementById('btnConnect').addEventListener('click', function(){
+      if( mp3player.connection ) {
+        mp3player.closeSocket();
+        return;
+      }
+      var ipAddress = document.getElementById('ipAddress');
+      var tmpValue = ipAddress.value;
+      if ( tmpValue.length < 1) { return; }
+      var value = 'ws://' + tmpValue + ':1234';
+      mp3player.connectSocket(value);
+      console.log('setupControlListeners.addEventListener(): Connected Socket to=['+value+'], socket=['+mp3player.connection+']')
+    });
+    document.getElementById('btnStartMp3').addEventListener('click', function () {
+      if ( mp3player.audioPlaying === true ) {
+        mp3player.pause();
+      } else {
+        mp3player.start();
+      }
+    });
+    document.getElementById('loadMsg' ).addEventListener('webkitAnimationEnd',function() {
+      console.log('Animation end');
+      mp3player.notifyRestoreAfterBuildBreak();
+    });
+  },
+
 
 
 // GEEK HANS - start here
