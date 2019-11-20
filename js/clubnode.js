@@ -284,10 +284,23 @@ var mp3player = {
     element.className = cn;
   },
     
+  /* does a element contain a specific class */
+  hasClass: function(classname, element) {
+    return new RegExp(' ' + classname + ' ').test(' ' + element.className + ' ');
+  },
+  /* random number inclusive of low and upper range */
+  intRandom: function(low, up) {
+    return Math.floor(Math.random() * (up - low) + low);
+  },
+  /* distance between two points */
+  findDistance: function(p1, p2) {
+    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+  }
 
-// GEEK HANS - start here      
 };
 
+// GEEK HANS - start here      
+                
   function ParticleEl( i ) {
     this.r = Math.round( Math.random() * 255 | 0 );
     this.g = Math.round( Math.random() * 255 | 0 );
