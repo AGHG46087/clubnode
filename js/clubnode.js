@@ -430,8 +430,35 @@ var radialBarsState = {
   }
 };
 
+var lifeLineState = {
+  lastValue: [],
+  separate: [],
+  separateTimer: 0,
+  shadowBlur: 0,
+  average: 0,
+  color: {},
+  choice: 0,
+  initialized: false,
 
+  init: function() {
+    for (var i = 0; i < 256; i++) {
+      lifeLineState.lastValue[i] = 0;
+    }
+    lifeLineState.color = {
+      r: 100,
+      g: 100,
+      b: 100,
+      rS: utils.intRandom(1, 3),
+      gS: utils.intRandom(1, 3),
+      bS: utils.intRandom(1, 3),
+      rD: 1,
+      gD: 1,
+      bD: 1
+    };
+    lifeLineState.initialized = true;
+  },
 // GEEK HANS - start here      
+};
                 
   function ParticleEl( i ) {
     this.r = Math.round( Math.random() * 255 | 0 );
