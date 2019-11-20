@@ -491,10 +491,31 @@ var lifeLineState = {
         lifeLineState.color.bD = 1;
       }
     }
-  },
+  }
 };
 
 
+var triangleState = {
+  beginAngle: 0,
+  stars: new Array(512),
+  MAX_DEPTH: 32,
+  initialized: false,
+
+
+  init: function() {
+
+    for( var i = 0; i < triangleState.stars.length; i++ ) {
+      triangleState.stars[i] = {
+        x: utils.intRandom(-25,25),
+        y: utils.intRandom(-25,25),
+        z: utils.intRandom(1,triangleState.MAX_DEPTH)
+      }
+    }
+    triangleState.initialized = true;
+  }
+
+};
+                
 // GEEK HANS - start here
                 
   function ParticleEl( i ) {
