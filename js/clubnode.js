@@ -1143,6 +1143,27 @@ var mp3player = {
       mp3player.notifyRestoreAfterBuildBreak();
     });
   },
+  notifyRestoreAfterBuildBreak: function() {
+    console.log( 'notifyRestoreAfterBuildBreak(): mp3 file to be loaded: ' + mp3player.mp3file );
+    mp3player.loadMp3File( mp3player.mp3file ); // restore the sound file
+    audio.addEventListener('canplay', function() {
+      mp3player.start();
+      audio.removeEventListener('canplay');
+    });
+    var el = document.getElementById('loadMsg' );
+    utils.removeClass('msg-alert', el);
+    setTimeout(function() { el.innerHTML = '&nbsp;'; },2000);
+  },
+  notifyBuildBreak: function(msg) {
+    var soundFile = './music/zzbuildbreak.mp3';
+    mp3player.loadMp3File( soundFile, true );
+    audio.autoplay = true;
+    var el = document.getElementById('loadMsg');
+    el.innerHTML = msg || 'Build Break';
+    utils.addClass('msg-alert', el);
+    mp3player.sendData('ACK: ' + msg);
+    console.log( 'notifyBuildBreak(): mp3 file to be loaded: ' + soundFile );
+  },
 
 
 
