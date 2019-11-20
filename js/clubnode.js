@@ -367,6 +367,36 @@ var connectedParticlesState = {
 
 };
 
+var peakedBarsState = {
+  barSize: 64,
+  bars: [],
+  dots: [],
+  width: 0,
+  height: 0,
+  /*color: //['157, 193, 243', '245, 232, 153', '226, 51, 110' ], */
+  colors: ['0,47,229', '5,223,230', '11,231,70', '157, 193, 243', '245, 232, 153', '226, 51, 110', '206,233,20', '233,180,23', '234,102,26', '241,90,17', '248,51,9' ],
+  initialized: false,
+
+  init: function(width, height) {
+    peakedBarsState.width = width;
+    peakedBarsState.height = height;
+    peakedBarsState.bars.length = 0; // empty the array
+    peakedBarsState.dots.length = 0; // empty the array
+    var barWidth = Math.floor(width/ peakedBarsState.barSize);
+    for( var i = 0; i < peakedBarsState.barSize; i++ ) {
+      peakedBarsState.dots[i] = 0;
+      peakedBarsState.bars[i] = {
+        x: (i * barWidth),
+        w: barWidth,
+        h: 0,
+        color: peakedBarsState.colors[Math.floor(Math.random() * peakedBarsState.colors.length)]
+      }
+    }
+    peakedBarsState.initialized = true;
+  }
+};
+
+
 // GEEK HANS - start here      
                 
   function ParticleEl( i ) {
