@@ -299,6 +299,24 @@ var mp3player = {
 
 };
 
+var bigPulseState = {
+  colors: ['#fd2700', '#64d700', 'fdfb00', '#8314fd', '#b8009c', '#fa60fd', '#fa0000', '#e64200', '#0093f0', '#fda0c0'],
+  currentColor: '#0093f0',
+  addCount: 0,
+  lastAverage: 0,
+  circles: [],
+  initialized: false,
+  init: function() {
+    for ( var z = 0; z < 10; z++ ) {
+      bigPulseState.circles[z] = {
+        c: '', r: 0, a: 0
+      }
+    }
+    bigPulseState.currentColor = bigPulseState.colors[utils.intRandom(0,bigPulseState.colors.length)];
+    bigPulseState.initialized = true;
+  }
+};
+
 // GEEK HANS - start here      
                 
   function ParticleEl( i ) {
