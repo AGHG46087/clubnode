@@ -555,8 +555,29 @@ var sinWaveState = {
     sinWaveState.initialized = true;
   }
 };
-                
+
+var mp3player = {
+  /* drawDots: Draws the visualizer as dots */
+  drawDots: function(data) {
+    var radius = 4;
+    var value = 0;
+    var offset = (mp3player.canvasHeight/2) * 0.25;
+
+    for( var i = 0; i < data.length; i++ ) {
+      value = data[i] + offset;
+      mp3player.ctx1.beginPath();
+      mp3player.ctx1.arc(i*12, mp3player.canvasHeight - value, radius, 0, 2 * Math.PI, false);
+      mp3player.ctx1.fillStyle = mp3player.dotGradient;
+      mp3player.ctx1.fill();
+      mp3player.ctx1.lineWidth = 1;
+      mp3player.ctx1.strokeStyle = '#003300';
+      mp3player.ctx1.stroke();
+    }
+  },
+  
 // GEEK HANS - start here
+};
+
                 
   function ParticleEl( i ) {
     this.r = Math.round( Math.random() * 255 | 0 );
