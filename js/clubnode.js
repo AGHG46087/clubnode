@@ -467,9 +467,35 @@ var lifeLineState = {
     }
     return rc;
   },
-
-// GEEK HANS - start here      
+  changeColor: function() {
+    lifeLineState.choice = utils.intRandom(0, 9);
+    if (lifeLineState.choice < 3) {
+      lifeLineState.color.r = lifeLineState.color.r + lifeLineState.color.rS * lifeLineState.color.rD;
+      if (lifeLineState.color.r > 225) {
+        lifeLineState.color.rD = -1;
+      } else if (lifeLineState.color.r < 100) {
+        lifeLineState.color.rD = 1;
+      }
+    } else if (lifeLineState.choice < 6) {
+      lifeLineState.color.g = lifeLineState.color.g + lifeLineState.color.gS * lifeLineState.color.gD;
+      if (lifeLineState.color.g > 225) {
+        lifeLineState.color.gD = -1;
+      } else if (lifeLineState.color.g < 100) {
+        lifeLineState.color.gD = 1;
+      }
+    } else {
+      lifeLineState.color.b = lifeLineState.color.b + lifeLineState.color.bS * lifeLineState.color.bD;
+      if (lifeLineState.color.b > 225) {
+        lifeLineState.color.bD = -1;
+      } else if (lifeLineState.color.b < 100) {
+        lifeLineState.color.bD = 1;
+      }
+    }
+  },
 };
+
+
+// GEEK HANS - start here
                 
   function ParticleEl( i ) {
     this.r = Math.round( Math.random() * 255 | 0 );
