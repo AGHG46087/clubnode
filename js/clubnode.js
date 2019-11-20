@@ -1200,7 +1200,71 @@ var mp3player = {
 
     return grad;
   },
+  /* getBarGradient: gradient color */
+  getBarGradient: function () {
+    if (!mp3player.ctx1 ) { return; }
+    var ctx = mp3player.ctx1;
+    var grad = ctx.createLinearGradient( 0, 0, 0, mp3player.canvasHeight );
+    // Compute Gradient colors
+    // http://www.perbang.dk/rgbgradient/
 
+    /*
+    grad.addColorStop(0.14, '#FF0000');
+    grad.addColorStop(0.285714286, '#FF7F00');
+    grad.addColorStop(0.428571429, '#FFFF00');
+    grad.addColorStop(0.571428571, '#00FF00');
+    grad.addColorStop(0.714285714, '#0000FF');
+    grad.addColorStop(0.857142857, '#4B0082');
+    grad.addColorStop(1.0, '#8F00FF');
+    */
+    grad.addColorStop( 1.00, '#002FE5' ); // BOTTOM
+    grad.addColorStop( 0.90, '#05DFE6' );
+    grad.addColorStop( 0.80, '#0BE746' );
+    grad.addColorStop( 0.70, '#CEE914' );
+    grad.addColorStop( 0.60, '#E9B417' );
+    grad.addColorStop( 0.50, '#EAB417' );
+    grad.addColorStop( 0.40, '#EA661A' );
+    grad.addColorStop( 0.30, '#F15A11' );
+    grad.addColorStop( 0.20, '#F16011' );
+    grad.addColorStop( 0.10, '#F83309' );
+    grad.addColorStop( 0.00, '#FF0000' ); // top
+
+    return grad;
+  },
+
+  /* getBarGradient2: gradient color */
+  getBarGradient2: function () {
+    if (!mp3player.ctx1 ) { return; }
+    var ctx = mp3player.ctx1;
+    var grad = ctx.createLinearGradient( 0, 0, 0, mp3player.canvasHeight );
+    // Compute Gradient colors
+    // http://www.perbang.dk/rgbgradient/
+
+    grad.addColorStop(1.00, '#002fdd');
+    grad.addColorStop(0.80, '#d20017');
+    grad.addColorStop(0.70, '#ca6200');
+    grad.addColorStop(0.60, '#b1c200');
+    grad.addColorStop(0.30, '#74bf00');
+
+    return grad;
+  },
+  /* getBarGradient3: gradient color */
+  getBarGradient3: function () {
+    if (!mp3player.ctx1 ) { return; }
+    var ctx = mp3player.ctx1;
+    var grad = ctx.createLinearGradient( 0, 0, 0, mp3player.canvasHeight );
+    // Compute Gradient colors
+    // http://www.perbang.dk/rgbgradient/
+    // Rainbow
+    grad.addColorStop(0,"black");
+    grad.addColorStop(0.3,"magenta");
+    grad.addColorStop(0.5,"blue");
+    grad.addColorStop(0.6,"green");
+    grad.addColorStop(0.8,"yellow");
+    grad.addColorStop(1,"red");
+
+    return grad;
+  },
 
 
 // GEEK HANS - start here
