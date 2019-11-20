@@ -596,6 +596,97 @@ var mp3player = {
     }
   },
 
+  /* drawRadialBars: Draws visualizer as bars radiating from the center of the canvas */
+  drawRadialBars: function(data) {
+    var centerX = parseInt(mp3player.canvasWidth / 2, 10);
+    var centerY = parseInt(mp3player.canvasHeight / 2, 10);
+    var radius = 10;
+    var value = 0;
+    var offset = (mp3player.canvasHeight/2) * 0.25;
+
+    mp3player.ctx1.beginPath();
+    mp3player.ctx1.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    mp3player.ctx1.fillStyle = mp3player.pulseGradient;
+    mp3player.ctx1.fill();
+
+    var radians, innerX, outerX, innerY, outerY;
+    for ( var i = 0; i < data.length; i++ ) {
+      value = data[i] + offset;
+      radians = i * (2 * Math.PI / 180);
+      innerX = centerX + radius * Math.cos(radians);
+      innerY = centerY + radius * Math.sin(radians);
+      outerX = centerX + value * Math.cos(radians) ;
+      outerY = centerY + value * Math.sin(radians)- (value * 0.10);
+
+      mp3player.ctx1.beginPath();
+      mp3player.ctx1.moveTo(innerX, innerY);
+      mp3player.ctx1.lineTo(outerX, outerY);
+      mp3player.ctx1.strokeStyle = mp3player.dotGradient;
+      mp3player.ctx1.lineWidth = (i % 5);
+      mp3player.ctx1.stroke();
+
+    }
+  },
+
+  /* drawBigPulse: Draws the visualizer as a pulse that emits radials */
+  drawBigPulse: function(data) {
+    var stateVars = bigPulseState;
+    var i, len, maxWidth;
+    var circleEnd = 2 * Math.PI, speed = 20, average, total = 0,
+      center = {
+        x: Math.floor(mp3player.canvasWidth / 2),
+        y: Math.floor(mp3player.canvasHeight / 2)
+      };
+
+
+    for (var t = 0, len_t = data.length; t < len_t; t += 10) {
+      total += data[t];
+    }
+    average = total / len_t * 10;
+
+
+    mp3player.ctx1.fillStyle = mp3player.pulseGradient;
+    mp3player.ctx1.beginPath();
+    mp3player.ctx1.arc(center.x, center.y, average, 0, circleEnd, true);
+    mp3player.ctx1.closePath();
+    mp3player.ctx1.fill();
+
+    mp3player.ctx1.lineWidth = 4;
+    for (i = 0, len = stateVars.circles.length, maxWidth = mp3player.canvasWidth / 1.5; i < len; i++) {
+      var c = stateVars.circles[i];
+      if (c.a == 0) {
+        continue;
+      }
+      mp3player.ctx1.strokeStyle = c.c;
+      mp3player.ctx1.beginPath();
+      mp3player.ctx1.arc(center.x, center.y, c.r, 0, circleEnd, true);
+      mp3player.ctx1.closePath();
+      mp3player.ctx1.stroke();
+      c.r += speed;
+      if (c.r > maxWidth) {
+        c.a = 0;
+      }
+    }
+    if (average < stateVars.lastAvarage) {
+      if (stateVars.addCount > 2) {
+        for (i = 0, len = stateVars.circles.length; i < len; i++) {
+          if (stateVars.circles[i].a == 0) {
+            stateVars.circles[i].c = stateVars.currentColor;
+            stateVars.circles[i].r = average;
+            stateVars.circles[i].a = 1;
+            break;
+          }
+        }
+      } else if (stateVars.addCount > 0) {
+        stateVars.currentColor = stateVars.colors[utils.intRandom(0, stateVars.colors.length)];
+      }
+      stateVars.addCount = 0;
+    } else {
+      stateVars.addCount++;
+    }
+    stateVars.lastAvarage = average;
+  },
+
 
 // GEEK HANS - start here
 };
