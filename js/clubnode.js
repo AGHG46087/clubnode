@@ -627,7 +627,7 @@ var mp3player = {
 
     }
   },
-
+  
   /* drawBigPulse: Draws the visualizer as a pulse that emits radials */
   drawBigPulse: function(data) {
     var stateVars = bigPulseState;
@@ -686,7 +686,6 @@ var mp3player = {
     }
     stateVars.lastAvarage = average;
   },
-
 
 // GEEK HANS - start here
 };
