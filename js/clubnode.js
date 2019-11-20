@@ -457,6 +457,17 @@ var lifeLineState = {
     };
     lifeLineState.initialized = true;
   },
+  scaleFactor: function(height) {
+    var rc = 80; //
+    if ( height > 360 ) {
+      var baseThreshold = rc; // @ height 360
+      var percentage = (height / baseThreshold) / 100;
+      var ratio = parseInt( height * percentage );
+      rc = (baseThreshold - ratio) + 10;
+    }
+    return rc;
+  },
+
 // GEEK HANS - start here      
 };
                 
