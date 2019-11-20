@@ -909,6 +909,34 @@ var mp3player = {
     stateVars.beginAngle = (stateVars.beginAngle + 0.00001 * total) % twoPI;
   },
 
+  /* drawSinWave:  draws visualizer as a sin wave */
+  drawSinWave: function(data) {
+    var stateVars = sinWaveState;
+    var halfH = mp3player.canvasHeight / 2, x, gap, cx, cy, i;
+    var offset = (mp3player.canvasHeight > 400 ) ? (mp3player.canvasHeight/2) * 0.25 : 0;
+
+    for( i=0; i < stateVars.len; i++ ) {
+      stateVars.line[i] = (data[i] + offset) * stateVars.sinAngle[i];
+    }
+    mp3player.ctx1.shadowColor = '#fffa47';
+    mp3player.ctx1.shadowBlur = 15;
+    mp3player.ctx1.color =  mp3player.barGradient;
+    mp3player.ctx1.strokeStyle = mp3player.barGradient;
+    mp3player.ctx1.lineWidth = 2;
+
+    mp3player.ctx1.beginPath();
+    x = 0;
+    gap = Math.ceil(mp3player.canvasWidth / stateVars.len);
+    mp3player.ctx1.moveTo(x, halfH);
+    for( i=1; i < stateVars.len; i++ ) {
+      cx = (x + x + gap ) / 2;
+      cy = halfH - (stateVars.line[i] + stateVars.line[i+1]) / 2;
+      mp3player.ctx1.quadraticCurveTo(x, halfH - stateVars.line[i], cx, cy);
+      x += gap;
+    }
+    mp3player.ctx1.quadraticCurveTo(x, halfH - stateVars.line[i], x + gap, halfH - stateVars.line[i+1]);
+    mp3player.ctx1.stroke();
+  },
 
 // GEEK HANS - start here
 };
