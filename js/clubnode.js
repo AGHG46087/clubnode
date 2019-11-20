@@ -317,6 +317,56 @@ var bigPulseState = {
   }
 };
 
+var connectedParticlesState = {
+  canvasWidth: 0,
+  canvasHeight: 0,
+  fftSize: 512,
+  particles: [],
+  particleNum: 128,
+  colors: ['#F35D4F','#f36849','#C0D988','#6DDAF1','#F1E85B', '706DF3'],
+
+  initialized: false,
+  divisor: function () {
+    var rc = 4;
+    if (( connectedParticlesState.canvasHeight < 550 ) || ( connectedParticlesState.canvasWidth < 801 )) {
+      rc = 8;
+    }
+    if (( connectedParticlesState.canvasHeight < 351 ) || ( connectedParticlesState.canvasWidth < 501 )) {
+      rc = 16;
+    }
+    if (( connectedParticlesState.canvasHeight < 251 ) || ( connectedParticlesState.canvasWidth < 301 )) {
+      rc = 32;
+    }
+
+    return rc;
+  },
+  init: function(width, height) {
+
+    // internal Object Particle.
+    function Particle() {
+      this.x = Math.round(Math.random() * connectedParticlesState.canvasWidth);
+      this.y = Math.round(Math.random() * connectedParticlesState.canvasHeight);
+      this.rad = Math.round(Math.random() * 10) + 15;
+      this.rgba = connectedParticlesState.colors[utils.intRandom(0,connectedParticlesState.colors.length )];
+      this.vx = Math.round(Math.random() * 3) - 1.5;
+      this.vy = Math.round(Math.random() * 3) - 1.5;
+    }
+
+    connectedParticlesState.particles.length = 0;
+    connectedParticlesState.canvasWidth = width || 1000;
+    connectedParticlesState.canvasHeight = height || 350;
+    var particleDivisor = connectedParticlesState.divisor();
+    connectedParticlesState.particleNum = connectedParticlesState.fftSize / particleDivisor;
+    for( var i = 0; i < connectedParticlesState.particleNum; i++ ) {
+      connectedParticlesState.particles.push(new Particle());
+    }
+    //console.log('connectedParticlesState.init(): fftSize=['+connectedParticlesState.fftSize+'], divisor=['+particleDivisor+'] particles.length=['+connectedParticlesState.particles.length+']');
+
+    connectedParticlesState.initialized = true;
+  }
+
+};
+
 // GEEK HANS - start here      
                 
   function ParticleEl( i ) {
