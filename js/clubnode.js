@@ -1084,6 +1084,23 @@ var mp3player = {
     console.log( 'mp3player.windowResizeHandler(): width=[' + mp3player.canvasWidth + '], height=[' + mp3player.canvasHeight + ']' );
 
   },
+  /* setupAudioListeners: listeners on the audio element */
+  setupAudioListeners: function() {
+    var currentTimeNode = document.getElementById('current-time');
+    audio.addEventListener('timeupdate', function() {
+      var currTime = audio.currentTime;
+      var seconds = ('0' + parseInt(currTime %60 ));
+      if ( seconds.length > 2 ) { seconds = seconds.substring(1); }
+      currentTimeNode.textContent = parseInt(currTime / 60 ) + ':' + seconds;
+      mp3player.currTime = currTime;
+    });
+    audio.addEventListener('ended', function() {
+      console.log('Audio ended event');
+      mp3player.closeSocket();
+      mp3player.resetLifeUniverseAndEverything();
+      currentTimeNode.innerHTML = '&nbsp;';
+    });
+  },
 
 
 // GEEK HANS - start here
