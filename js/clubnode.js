@@ -859,6 +859,56 @@ var mp3player = {
   },
 
 
+  /* drawTriangles: draws visualizer as rotating triangles */
+  drawTriangles: function(data) {
+    var stateVars = triangleState;
+    var angle = stateVars.beginAngle,
+      cx = mp3player.canvasWidth / 2,
+      cy = mp3player.canvasHeight / 2,
+      total = 0, k, px, py, size, shade,
+      speedFactor = (data.length >= 1024) ? 32 : 16,
+      len = data.length / speedFactor,
+      twoPI = 2 * Math.PI,
+      angleGap = twoPI / 3,
+      color =  'rgba(186, 135, 72, 0.5)';
+
+    // draw star field
+    for(var j = 0; j < stateVars.stars.length; j++ ) {
+     stateVars.stars[j].z -= 0.01;
+      if( stateVars.stars[j].z <= 0 ) {
+        stateVars.stars[j].x = utils.intRandom(-25,25);
+        stateVars.stars[j].y = utils.intRandom(-25,25);
+        stateVars.stars[j].z = stateVars.MAX_DEPTH;
+      }
+
+      k = 128 / stateVars.stars[j].z;
+      px = stateVars.stars[j].x * k + cx;
+      py = stateVars.stars[j].y * k + cy;
+
+      if ( px >= 0 && px <= mp3player.canvasWidth && py >= 0 && py <= mp3player.canvasHeight ) {
+        size = (1 - stateVars.stars[j].z / 32.0) * 5;
+        shade = parseInt((1 - stateVars.stars[j].z / 32.0) * 255);
+        mp3player.ctx1.fillStyle = 'rgb(' + shade + ',' +shade +',' + shade + ')';
+        mp3player.ctx1.fillRect(px,py, size, size);
+      }
+    }
+
+    mp3player.ctx1.globalCompositeOperation = 'lighter';
+    mp3player.ctx1.strokeStyle = color;
+    mp3player.ctx1.lineWidth = 10;
+    for (var i = 12; i < len; i += 2) {
+      angle += 0.2;
+      mp3player.ctx1.beginPath();
+      mp3player.ctx1.moveTo(cx + data[i] * Math.sin(angle), cy + data[i] * Math.cos(angle));
+      mp3player.ctx1.lineTo(cx + data[i] * Math.sin(angle + angleGap), cy + data[i] * Math.cos(angle + angleGap));
+      mp3player.ctx1.lineTo(cx + data[i] * Math.sin(angle + angleGap * 2), cy + data[i] * Math.cos(angle + angleGap * 2));
+      mp3player.ctx1.closePath();
+      mp3player.ctx1.stroke();
+      total += (data[i]);
+    }
+    stateVars.beginAngle = (stateVars.beginAngle + 0.00001 * total) % twoPI;
+  },
+
 
 // GEEK HANS - start here
 };
