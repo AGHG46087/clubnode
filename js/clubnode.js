@@ -938,6 +938,88 @@ var mp3player = {
     mp3player.ctx1.stroke();
   },
 
+  /* drawRadialPeaks:  Draw circled clock graph, inspired by the Apple Watch */
+  drawRadialPeaks: function(data) {
+    var stateVars = radialBarsState;
+    var colors = stateVars.colors,
+      RANDOM_COLORS = true,
+      recycleColors = (RANDOM_COLORS && (parseInt(mp3player.currTime) % colors.length === 0)),
+      centerY = parseInt( mp3player.canvasHeight / 2, 10 ),
+      centerX = parseInt( mp3player.canvasWidth / 2, 10 ),
+      radius = Math.floor(Math.min(centerY, centerX)-10 ),
+      ROTATE_TO_TOP = false,
+      degToRads = (Math.PI/180),
+      startDeg = (ROTATE_TO_TOP ) ? 270 : 0,// this is the top of the circle
+      startAngle = startDeg * degToRads, //1.50 * Math.PI //just a hair off the top
+      endAngle = (2 * Math.PI), // this is 0 radians
+      lineWidth = 15,
+      done = false;
+
+
+    /* If we have a true statement, then we will randomize the colors every so often */
+    if ( recycleColors ) {
+      stateVars.randomizeColors();
+    }
+
+    var arc, value, tempVal, peanut;
+    /* Only draw enough circles as we have radius available.  Done will be true when radius is less than lineWidth. */
+    for ( var i = 0; !done && i < data.length; i++ ) {
+      /* are doing our calculations in degrees and compute en dAngle to radians, if tempVal is greater than 360, then normalize it  */
+      tempVal = startDeg + data[i];
+      value = (tempVal > 360) ? (tempVal - 360) : tempVal;
+      endAngle = value * degToRads;
+
+      /* arc is pulled here for the color - it is used after the bar to compute the peanut */
+      arc = stateVars.arcs[i];
+      /* strokeStyle color is the index mod by the colors array length */
+      mp3player.ctx1.strokeStyle = (RANDOM_COLORS) ?  'rgba('+arc.color+', 0.8)' : 'rgba('+colors[i%colors.length]+', 0.8)';
+      mp3player.ctx1.lineCap = 'round';
+      mp3player.ctx1.lineWidth = lineWidth;
+      mp3player.ctx1.beginPath();
+      mp3player.ctx1.arc( centerX, centerY, radius, startAngle, endAngle, false );
+      mp3player.ctx1.stroke();
+
+      /* now for the peanut arc - where is now and adjust decay of position */
+      if( arc.h == 0 ) {
+        arc.h = value;
+      } else {
+        if( arc.h < value ) {
+          arc.h += Math.floor((value - arc.h)/2);
+        } else {
+          arc.h -= Math.floor((arc.h - value)/1.2);
+        }
+      }
+      /* add 10% to the position, if we are the range of 270 to 360, make it the position of the long bar + 10%  */
+      arc.h *= 1.1;
+      if ( ROTATE_TO_TOP ) {
+        arc.h = ( tempVal > 270 && tempVal <= 360 ) ? value * 0.10 : arc.h;
+      }
+
+      /* record the last position and resuse next time around the frame */
+      stateVars.dots[i] = (stateVars.dots[i] < arc.h ) ? arc.h : stateVars.dots[i]-1;
+
+      tempVal = stateVars.dots[i];
+
+      /* What is the size of the peanut bar - radius affects the length, so adjust accordingly */
+      peanut =  ( i <= 1 ) ? 3 : (stateVars.arcSize - (stateVars.arcSize - i ));
+      /* Compute the peanut start and end angles into radians */
+      arc.startAngle = tempVal * degToRads;
+      tempVal += peanut;
+      arc.endAngle = tempVal * degToRads;
+
+      /* Draw the peanut */
+      mp3player.ctx1.beginPath();
+      mp3player.ctx1.strokeStyle = mp3player.ctx1.strokeStyle.replace('0.8)', '0.5)');
+      mp3player.ctx1.arc( centerX, centerY, radius, arc.startAngle, arc.endAngle, false );
+      mp3player.ctx1.stroke();
+
+      /* compute the amount of radius we have remaining, if it is too little we are done with visualization */
+      radius -= lineWidth+1;
+      done = (radius < lineWidth);
+    }
+  },
+
+
 // GEEK HANS - start here
 };
 
