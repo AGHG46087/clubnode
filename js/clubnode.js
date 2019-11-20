@@ -596,6 +596,37 @@ var mp3player = {
     }
   },
 
+  /* drawRadialBars: Draws visualizer as bars radiating from the center of the canvas */
+  drawRadialBars: function(data) {
+    var centerX = parseInt(mp3player.canvasWidth / 2, 10);
+    var centerY = parseInt(mp3player.canvasHeight / 2, 10);
+    var radius = 10;
+    var value = 0;
+    var offset = (mp3player.canvasHeight/2) * 0.25;
+
+    mp3player.ctx1.beginPath();
+    mp3player.ctx1.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    mp3player.ctx1.fillStyle = mp3player.pulseGradient;
+    mp3player.ctx1.fill();
+
+    var radians, innerX, outerX, innerY, outerY;
+    for ( var i = 0; i < data.length; i++ ) {
+      value = data[i] + offset;
+      radians = i * (2 * Math.PI / 180);
+      innerX = centerX + radius * Math.cos(radians);
+      innerY = centerY + radius * Math.sin(radians);
+      outerX = centerX + value * Math.cos(radians) ;
+      outerY = centerY + value * Math.sin(radians)- (value * 0.10);
+
+      mp3player.ctx1.beginPath();
+      mp3player.ctx1.moveTo(innerX, innerY);
+      mp3player.ctx1.lineTo(outerX, outerY);
+      mp3player.ctx1.strokeStyle = mp3player.dotGradient;
+      mp3player.ctx1.lineWidth = (i % 5);
+      mp3player.ctx1.stroke();
+
+    }
+  },
 
 // GEEK HANS - start here
 };
