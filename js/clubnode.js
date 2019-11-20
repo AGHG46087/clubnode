@@ -1207,29 +1207,7 @@ var mp3player = {
     var grad = ctx.createLinearGradient( 0, 0, 0, mp3player.canvasHeight );
     // Compute Gradient colors
     // http://www.perbang.dk/rgbgradient/
-    /*
-    grad.addColorStop(0.14, '#FF0000');
-    grad.addColorStop(0.285714286, '#FF7F00');
-    grad.addColorStop(0.428571429, '#FFFF00');
-    grad.addColorStop(0.571428571, '#00FF00');
-    grad.addColorStop(0.714285714, '#0000FF');
-    grad.addColorStop(0.857142857, '#4B0082');
-    grad.addColorStop(1.0, '#8F00FF');
-    */
-    grad.addColorStop( 1.00, '#002FE5' ); // BOTTOM
-    grad.addColorStop( 0.90, '#05DFE6' );
-    grad.addColorStop( 0.80, '#0BE746' );
-    grad.addColorStop( 0.70, '#CEE914' );
-    grad.addColorStop( 0.60, '#E9B417' );
-    grad.addColorStop( 0.50, '#EAB417' );
-    grad.addColorStop( 0.40, '#EA661A' );
-    grad.addColorStop( 0.30, '#F15A11' );
-    grad.addColorStop( 0.20, '#F16011' );
-    grad.addColorStop( 0.10, '#F83309' );
-    grad.addColorStop( 0.00, '#FF0000' ); // top
 
-    return grad;
-  },
     /*
     grad.addColorStop(0.14, '#FF0000');
     grad.addColorStop(0.285714286, '#FF7F00');
@@ -1288,8 +1266,43 @@ var mp3player = {
     return grad;
   },
 
+  /* init:  main initializer for the mp3player */
+  init: function () {
+    // invoke the size changes at least once,  make sure all canvas are correct for start up
+    mp3player.windowResizeHandler();
+    // get the canvas contexts
+    mp3player.ctx1 = mp3player.canvas1.getContext( '2d' );
+    mp3player.ctx2 = mp3player.canvas2.getContext( '2d' );
 
-// GEEK HANS - start here
+    // Pull the style Height and width - canvas1 should suffice
+    var style = ( window.getComputedStyle ) ? window.getComputedStyle( mp3player.canvas1 ) :  mp3player.canvas1.currentStyle;
+    mp3player.canvasHeight = parseInt( style.height, 10 );
+    mp3player.canvasWidth = parseInt( style.width, 10 );
+    console.log( 'mp3player.init(): width=[' + mp3player.canvasWidth + '], height=[' + mp3player.canvasHeight + ']' );
+
+    // setup gradient colors
+    mp3player.barGradient = mp3player.getBarGradient();
+    mp3player.hotGradient = mp3player.getBarGradient2();
+    mp3player.rgbGradient = mp3player.getBarGradient3();
+    mp3player.dotGradient = mp3player.getDotGradient();
+    mp3player.pulseGradient = mp3player.getCircleGradient();
+
+    // Declare the auio before the listeners,  we are adding an time update event listener to the audio.
+    mp3player.setupControlListeners();
+    mp3player.setupPatterns();
+
+    // initialize all state state drawing objects
+    bigPulseState.init();
+    connectedParticlesState.init(mp3player.canvasWidth, mp3player.canvasHeight);
+    peakedBarsState.init(mp3player.canvasWidth, mp3player.canvasHeight);
+    lifeLineState.init();
+    triangleState.init();
+    sinWaveState.init(mp3player.ctx1, mp3player.canvasWidth, mp3player.canvasHeight);
+    radialBarsState.init(mp3player.canvasWidth, mp3player.canvasHeight);
+
+    console.log( '%cmp3player.init(): complete', "color:cyan; background:blue; font-size: 16px" );
+  }
+
 };
 
                 
