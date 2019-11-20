@@ -627,7 +627,7 @@ var mp3player = {
 
     }
   },
-  
+
   /* drawBigPulse: Draws the visualizer as a pulse that emits radials */
   drawBigPulse: function(data) {
     var stateVars = bigPulseState;
@@ -687,6 +687,59 @@ var mp3player = {
     stateVars.lastAvarage = average;
   },
 
+  /* drawConnectedParticles: draws visualizer as a particles with connected limbs of related particles */
+  drawConnectedParticles: function(data) {
+    var stateVars = connectedParticlesState;
+    var p, p2, i, j, len, factor, total, avg;
+    len = data.length / 2; //256; //data.length / 2;
+    mp3player.ctx1.globalCompositeOperation = 'lighter';
+    mp3player.ctx1.linewidth = 0.5;
+
+    for (i = 0, total = 0; i < len; i++) {
+      total += data[i];
+    }
+    avg = total / len;
+    var partLen = stateVars.particles.length;
+
+    for(i = 0; i < partLen; i++){
+      p = stateVars.particles[i];
+      factor = 1;
+      for(j = 0; j < partLen; j++){
+        p2 = stateVars.particles[j];
+        if(p.rgba == p2.rgba && utils.findDistance(p, p2) < avg){
+          mp3player.ctx1.strokeStyle = p.rgba;
+          mp3player.ctx1.beginPath();
+          mp3player.ctx1.moveTo(p.x, p.y);
+          mp3player.ctx1.lineTo(p2.x, p2.y);
+          mp3player.ctx1.stroke();
+          factor += 0.6;
+        }
+      }
+
+      mp3player.ctx1.fillStyle = p.rgba;
+      mp3player.ctx1.strokeStyle = p.rgba;
+
+      mp3player.ctx1.beginPath();
+      mp3player.ctx1.arc(p.x, p.y, p.rad * factor, 0, Math.PI * 2, true);
+      mp3player.ctx1.fill();
+      mp3player.ctx1.closePath();
+
+      mp3player.ctx1.beginPath();
+      mp3player.ctx1.arc(p.x, p.y, (p.rad + 5) * factor, 0, Math.PI * 2, true);
+      mp3player.ctx1.stroke();
+      mp3player.ctx1.closePath();
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if(p.x > mp3player.canvasWidth + p.rad) p.x = 0;
+      if(p.x < -p.rad) p.x = mp3player.canvasWidth;
+      if(p.y > mp3player.canvasHeight + p.rad) p.y = 0;
+      if(p.y < -p.rad) p.y = mp3player.canvasHeight;
+    }
+  },
+
+  
 // GEEK HANS - start here
 };
 
