@@ -771,6 +771,95 @@ var mp3player = {
     }
   },
   
+  /* drawLifeLine: draws visualizer that appears like a EKG life line */
+  drawLifeLine: function(data) {
+    var gradients = [mp3player.barGradient, mp3player.rgbGradient, mp3player.hotGradient];
+    var color = gradients[parseInt(mp3player.currTime) % gradients.length]; // mp3player.rgbGradient; //mp3player.hotGradient;
+
+    var stateVars = lifeLineState;
+    var width = mp3player.canvasWidth / 128,
+      x = 0,
+      y = 0,
+      i, j,
+      direction = 1,
+      middle = mp3player.canvasHeight / 2,
+      separateLength = 0,
+      separateNum = 0,
+      total = 0,
+      lastAverage = stateVars.average;
+
+    stateVars.changeColor();
+    var r = stateVars.color.r,
+        g = stateVars.color.g,
+        b = stateVars.color.b;
+
+    mp3player.ctx1.shadowColor = 'rgba(' + (r + 70) + ', ' + (g + 70) + ', ' + (b + 70) + ', 1)';
+    mp3player.ctx1.shadowBlur = stateVars.shadowBlur;
+    mp3player.ctx1.strokeStyle = color; //mp3player.barGradient;
+    //mp3player.ctx1.strokeStyle = 'rgba(' + r + ', ' + g + ', ' + b + ', 1)';
+    mp3player.ctx1.lineWidth = 5;
+    mp3player.ctx1.lineJoin = 'miter';
+    mp3player.ctx1.miterLimit = 100;
+    mp3player.ctx1.beginPath();
+    mp3player.ctx1.moveTo(0, middle);
+    if (stateVars.separateTimer == 0) {
+      stateVars.separateTimer = Math.floor(Math.random() * 50) + 20;
+      for (i = 0; i < 128; i++) {
+        stateVars.separate[i] = 0;
+      }
+      separateNum = Math.floor(Math.random() * 15);
+      for (i = 0; i < separateNum; i++) {
+        separateLength = Math.floor(Math.random() * 15);
+        var temp = Math.floor(Math.random() * 128);
+        stateVars.separate[temp] = 1;
+        for (j = 1; j < separateLength; j++) {
+          stateVars.separate[temp + j] = 1;
+        }
+      }
+    } else {
+      stateVars.separateTimer--;
+    }
+    var scaleFactor = stateVars.scaleFactor(mp3player.canvasHeight);  // 80;
+
+    for (i = 0; i < 128; i++) {
+      y = data[i] - (100 - i) * 0.5; // GEEK
+      y = (y - scaleFactor) < 0 ? 0 : y - scaleFactor;
+      if (y > middle) {
+        y = middle;
+      }
+      if (stateVars.separate[i] == 1) {
+        stateVars.lastValue[i] -= 20;
+        if (stateVars.lastValue[i] < 0) {
+          stateVars.lastValue[i] = 0;
+        }
+        y = stateVars.lastValue[i];
+      } else {
+        if (y - stateVars.lastValue[i] > 20) {
+          stateVars.lastValue[i] += 20;
+          y = stateVars.lastValue[i];
+        } else {
+          stateVars.lastValue[i] = y;
+        }
+      }
+      y = y * direction + middle;
+
+      mp3player.ctx1.lineTo(x, y );
+      total += y;
+      direction = -direction;
+      x = x + width;
+    }
+    stateVars.average = total / 128;
+    if (lastAverage > stateVars.average) {
+      stateVars.shadowBlur--;
+    } else {
+      stateVars.shadowBlur++;
+    }
+    mp3player.ctx1.lineTo(mp3player.canvasWidth, middle);
+    mp3player.ctx1.stroke();
+  },
+
+
+
 // GEEK HANS - start here
 };
 
