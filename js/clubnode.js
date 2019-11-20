@@ -575,6 +575,28 @@ var mp3player = {
     }
   },
   
+  /* drawInvertedBars: draws visualizer as two sets inverted on each other  */
+  drawInvertedBars: function(data) {
+    var spacer_width = 10;
+    var bar_width = 5;
+    var indexOffset = 100;
+    var offset = (mp3player.canvasHeight/3) * 0.25;
+    var numBars = Math.round(mp3player.canvasWidth / spacer_width );
+
+
+    var value = 0;
+    for( var i = 0; i < numBars; i++ ) {
+      value = data[i + indexOffset] + offset;
+      mp3player.ctx1.fillStyle = '#F6D565';
+      mp3player.ctx1.lineCap = 'round';
+      mp3player.ctx1.fillRect(i * spacer_width, mp3player.canvasHeight , bar_width, -value );
+      mp3player.ctx1.fillStyle = '#3A5E8C';
+      mp3player.ctx1.lineCap = 'round';
+      mp3player.ctx1.fillRect(i * spacer_width, 0 , bar_width, value );
+    }
+  },
+
+
 // GEEK HANS - start here
 };
 
