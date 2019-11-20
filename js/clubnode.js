@@ -1,3 +1,293 @@
+/*
+ *
+ */
+
+/* utility object contains methods */
+var utils = {
+  /* add a class to an element */
+  addClass: function ( classname, element ) {
+    var cn = element.className;
+    //test for existence
+    if ( cn.indexOf( classname ) != -1 ) {
+      return;
+    }
+    //add a space if the element already has class
+    if ( cn != '' ) {
+      classname = ' ' + classname;
+    }
+    element.className = cn + classname;
+  },
+  /* remove a class from an element */
+  removeClass: function ( classname, element ) {
+    var cn = element.className;
+    var rxp = new RegExp( "\\s?\\b" + classname + "\\b", "g" );
+    cn = cn.replace( rxp, '' );
+    element.className = cn;
+  },
+  /* does a element contain a specific class */
+  hasClass: function(classname, element) {
+    return new RegExp(' ' + classname + ' ').test(' ' + element.className + ' ');
+  },
+  /* random number inclusive of low and upper range */
+  intRandom: function(low, up) {
+    return Math.floor(Math.random() * (up - low) + low);
+  },
+  /* distance between two points */
+  findDistance: function(p1, p2) {
+    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+  }
+};
+
+var bigPulseState = {
+  colors: ['#fd2700', '#64d700', 'fdfb00', '#8314fd', '#b8009c', '#fa60fd', '#fa0000', '#e64200', '#0093f0', '#fda0c0'],
+  currentColor: '#0093f0',
+  addCount: 0,
+  lastAverage: 0,
+  circles: [],
+  initialized: false,
+  init: function() {
+    for ( var z = 0; z < 10; z++ ) {
+      bigPulseState.circles[z] = {
+        c: '', r: 0, a: 0
+      }
+    }
+    bigPulseState.currentColor = bigPulseState.colors[utils.intRandom(0,bigPulseState.colors.length)];
+    bigPulseState.initialized = true;
+  }
+};
+var connectedParticlesState = {
+  canvasWidth: 0,
+  canvasHeight: 0,
+  fftSize: 512,
+  particles: [],
+  particleNum: 128,
+  colors: ['#F35D4F','#f36849','#C0D988','#6DDAF1','#F1E85B', '706DF3'],
+
+  initialized: false,
+  divisor: function () {
+    var rc = 4;
+    if (( connectedParticlesState.canvasHeight < 550 ) || ( connectedParticlesState.canvasWidth < 801 )) {
+      rc = 8;
+    }
+    if (( connectedParticlesState.canvasHeight < 351 ) || ( connectedParticlesState.canvasWidth < 501 )) {
+      rc = 16;
+    }
+    if (( connectedParticlesState.canvasHeight < 251 ) || ( connectedParticlesState.canvasWidth < 301 )) {
+      rc = 32;
+    }
+
+    return rc;
+  },
+  init: function(width, height) {
+
+    // internal Object Particle.
+    function Particle() {
+      this.x = Math.round(Math.random() * connectedParticlesState.canvasWidth);
+      this.y = Math.round(Math.random() * connectedParticlesState.canvasHeight);
+      this.rad = Math.round(Math.random() * 10) + 15;
+      this.rgba = connectedParticlesState.colors[utils.intRandom(0,connectedParticlesState.colors.length )];
+      this.vx = Math.round(Math.random() * 3) - 1.5;
+      this.vy = Math.round(Math.random() * 3) - 1.5;
+    }
+
+    connectedParticlesState.particles.length = 0;
+    connectedParticlesState.canvasWidth = width || 1000;
+    connectedParticlesState.canvasHeight = height || 350;
+    var particleDivisor = connectedParticlesState.divisor();
+    connectedParticlesState.particleNum = connectedParticlesState.fftSize / particleDivisor;
+    for( var i = 0; i < connectedParticlesState.particleNum; i++ ) {
+      connectedParticlesState.particles.push(new Particle());
+    }
+    //console.log('connectedParticlesState.init(): fftSize=['+connectedParticlesState.fftSize+'], divisor=['+particleDivisor+'] particles.length=['+connectedParticlesState.particles.length+']');
+
+    connectedParticlesState.initialized = true;
+  }
+
+};
+var peakedBarsState = {
+  barSize: 64,
+  bars: [],
+  dots: [],
+  width: 0,
+  height: 0,
+  /*color: //['157, 193, 243', '245, 232, 153', '226, 51, 110' ], */
+  colors: ['0,47,229', '5,223,230', '11,231,70', '157, 193, 243', '245, 232, 153', '226, 51, 110', '206,233,20', '233,180,23', '234,102,26', '241,90,17', '248,51,9' ],
+  initialized: false,
+
+  init: function(width, height) {
+    peakedBarsState.width = width;
+    peakedBarsState.height = height;
+    peakedBarsState.bars.length = 0; // empty the array
+    peakedBarsState.dots.length = 0; // empty the array
+    var barWidth = Math.floor(width/ peakedBarsState.barSize);
+    for( var i = 0; i < peakedBarsState.barSize; i++ ) {
+      peakedBarsState.dots[i] = 0;
+      peakedBarsState.bars[i] = {
+        x: (i * barWidth),
+        w: barWidth,
+        h: 0,
+        color: peakedBarsState.colors[Math.floor(Math.random() * peakedBarsState.colors.length)]
+      }
+    }
+    peakedBarsState.initialized = true;
+  }
+};
+var radialBarsState = {
+  arcSize: 18,
+  arcs: [],
+  dots: [],
+  colors: ['5,223,230', '0,47,229', '234,102,26', '11,231,70', '248,51,9', '157, 193, 243', '245, 232, 153', '226, 51, 110', '206,233,20', '233,180,23',  '241,90,17'],
+  initialized: false,
+
+  init: function(width, height) {
+    var arcCount = 60;
+    radialBarsState.width = width;
+    radialBarsState.height = height;
+    radialBarsState.arcs.length = 0; // empty the array
+    radialBarsState.dots.length = 0; // empty the array
+    for( var i = 0; i < arcCount; i++ ) {
+      radialBarsState.dots[i] = 0;
+      radialBarsState.arcs[i] = {
+        startAngle: 0,
+        endAngle: 0,
+        h: 0,
+        color: radialBarsState.colors[utils.intRandom(0, i* radialBarsState.colors.length) % radialBarsState.colors.length]
+      }
+    }
+
+    radialBarsState.initialized = true;
+  },
+  randomizeColors: function() {
+    var arc;
+    for( var i = 0; i < radialBarsState.arcs.length; i++ ) {
+      arc = radialBarsState.arcs[i];
+      arc.color = radialBarsState.colors[utils.intRandom(0, i* radialBarsState.colors.length) % radialBarsState.colors.length];
+    }
+  }
+};
+var lifeLineState = {
+  lastValue: [],
+  separate: [],
+  separateTimer: 0,
+  shadowBlur: 0,
+  average: 0,
+  color: {},
+  choice: 0,
+  initialized: false,
+
+  init: function() {
+    for (var i = 0; i < 256; i++) {
+      lifeLineState.lastValue[i] = 0;
+    }
+    lifeLineState.color = {
+      r: 100,
+      g: 100,
+      b: 100,
+      rS: utils.intRandom(1, 3),
+      gS: utils.intRandom(1, 3),
+      bS: utils.intRandom(1, 3),
+      rD: 1,
+      gD: 1,
+      bD: 1
+    };
+    lifeLineState.initialized = true;
+  },
+  scaleFactor: function(height) {
+    var rc = 80; //
+    if ( height > 360 ) {
+      var baseThreshold = rc; // @ height 360
+      var percentage = (height / baseThreshold) / 100;
+      var ratio = parseInt( height * percentage );
+      rc = (baseThreshold - ratio) + 10;
+    }
+    return rc;
+  },
+
+  changeColor: function() {
+    lifeLineState.choice = utils.intRandom(0, 9);
+    if (lifeLineState.choice < 3) {
+      lifeLineState.color.r = lifeLineState.color.r + lifeLineState.color.rS * lifeLineState.color.rD;
+      if (lifeLineState.color.r > 225) {
+        lifeLineState.color.rD = -1;
+      } else if (lifeLineState.color.r < 100) {
+        lifeLineState.color.rD = 1;
+      }
+    } else if (lifeLineState.choice < 6) {
+      lifeLineState.color.g = lifeLineState.color.g + lifeLineState.color.gS * lifeLineState.color.gD;
+      if (lifeLineState.color.g > 225) {
+        lifeLineState.color.gD = -1;
+      } else if (lifeLineState.color.g < 100) {
+        lifeLineState.color.gD = 1;
+      }
+    } else {
+      lifeLineState.color.b = lifeLineState.color.b + lifeLineState.color.bS * lifeLineState.color.bD;
+      if (lifeLineState.color.b > 225) {
+        lifeLineState.color.bD = -1;
+      } else if (lifeLineState.color.b < 100) {
+        lifeLineState.color.bD = 1;
+      }
+    }
+  }
+};
+var triangleState = {
+  beginAngle: 0,
+  stars: new Array(512),
+  MAX_DEPTH: 32,
+  initialized: false,
+
+
+  init: function() {
+
+    for( var i = 0; i < triangleState.stars.length; i++ ) {
+      triangleState.stars[i] = {
+        x: utils.intRandom(-25,25),
+        y: utils.intRandom(-25,25),
+        z: utils.intRandom(1,triangleState.MAX_DEPTH)
+      }
+    }
+    triangleState.initialized = true;
+  }
+
+};
+var sinWaveState = {
+  sinAngle: [],
+  line: [],
+  len: 512 / 2 - 20, // smallest fft size
+  color: 0,
+  initialized: false,
+
+  sinWaveColor: function(context, width, height) {
+    if ( !context ) { return; }
+    sinWaveState.color = context.createLinearGradient(0, 0, 0, height);
+    sinWaveState.color.addColorStop(0.1, '#ff5614');
+    sinWaveState.color.addColorStop(0.3, '#fffa47');
+    sinWaveState.color.addColorStop(0.4, '#f93b04');
+    sinWaveState.color.addColorStop(0.5, '#f93b04');
+    sinWaveState.color.addColorStop(0.6, '#fffa47');
+    sinWaveState.color.addColorStop(0.7, '#f93b04');
+    sinWaveState.color.addColorStop(0.75, '#f01800');
+    sinWaveState.color.addColorStop(0.8, '#fb7220');
+    sinWaveState.color.addColorStop(0.9, '#f93b04');
+    sinWaveState.color.addColorStop(1, '#f01800');
+  },
+  init: function(context, width, height) {
+    var angleGap = Math.random() * 0.01 + 0.05,
+      angle = 0;
+
+    sinWaveState.sinAngle.length = 0;
+    sinWaveState.sinAngle[0] = Math.sin(angle);
+    for ( var i = 1; i < sinWaveState.len; i++ ) {
+      sinWaveState.sinAngle[i] = Math.sin(angle);
+      if((sinWaveState.sinAngle[i-1] > 0 && sinWaveState.sinAngle[i] < 0) ||
+         (sinWaveState.sinAngle[i-1] < 0 && sinWaveState.sinAngle[i] > 0)) {
+        angleGap = Math.random() * 0.01 + 0.05;
+      }
+      angle += angleGap;
+    }
+    sinWaveState.sinWaveColor(context, width, height);
+    sinWaveState.initialized = true;
+  }
+};
 
 var mp3player = {
   canvas1: document.getElementById( 'fft1' ),
@@ -33,7 +323,6 @@ var mp3player = {
 
     clearInterval(mp3player.patternInterval);
   },
-  
   /* start: kicks off the whole animations and audio */
   start: function () {
     // Make sure we have a Analyser first
@@ -68,7 +357,6 @@ var mp3player = {
       mp3player.toggleCanvasOrientation();
     }, 3000 );
   },
-  
   /* loadMp3File: When a mp3 is being loaded this will load a audio file, setup event listeners, and connect analyser */
   loadMp3File: function ( url, keepTitle ) {
     var elMsg = document.getElementById( 'loadMsg' );
@@ -134,7 +422,6 @@ var mp3player = {
     // window.audio = null;
 
   },
-  
   /* closeSocket: closes the socket connection to the web socket server */
   closeSocket: function() {
     if ( mp3player.connection ) {
@@ -154,7 +441,6 @@ var mp3player = {
 
     setTimeout(function() { elMsg.innerHTML = '&nbsp;'; }, 2000);
   },
-  
   /* connectSocket: requests a Web socket connection and setup listeners on the socket */
   connectSocket: function(url) {
     console.log('Requesting to connect to url=['+url+']');
@@ -195,7 +481,6 @@ var mp3player = {
       console.log('%cmp3player.connectSocket.onerror(): An Error ocurred when sending/receiving data=['+error+']', "color:yellow; background:red; font-size: 16px");
     };
   },
-
   /* sendData:  Sends the fft data to the web socket server */
   sendData: function(data) {
     // Sending data to the server if the connection is established
@@ -243,7 +528,6 @@ var mp3player = {
     }
 
   },
-       
   /* drawSymmetricCentered: draws visualizer as starting from center and draw out to boundries */
   drawSymmetricCentered: function(data) {
     var gradients = [mp3player.barGradient, mp3player.rgbGradient, mp3player.hotGradient, mp3player.dotGradient];
@@ -262,301 +546,6 @@ var mp3player = {
     }
 
   },
-
-  /* add a class to an element */
-  addClass: function ( classname, element ) {
-    var cn = element.className;
-    //test for existence
-    if ( cn.indexOf( classname ) != -1 ) {
-      return;
-    }
-    //add a space if the element already has class
-    if ( cn != '' ) {
-      classname = ' ' + classname;
-    }
-    element.className = cn + classname;
-  },
-  /* remove a class from an element */
-  removeClass: function ( classname, element ) {
-    var cn = element.className;
-    var rxp = new RegExp( "\\s?\\b" + classname + "\\b", "g" );
-    cn = cn.replace( rxp, '' );
-    element.className = cn;
-  },
-    
-  /* does a element contain a specific class */
-  hasClass: function(classname, element) {
-    return new RegExp(' ' + classname + ' ').test(' ' + element.className + ' ');
-  },
-  /* random number inclusive of low and upper range */
-  intRandom: function(low, up) {
-    return Math.floor(Math.random() * (up - low) + low);
-  },
-  /* distance between two points */
-  findDistance: function(p1, p2) {
-    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-  }
-
-};
-
-var bigPulseState = {
-  colors: ['#fd2700', '#64d700', 'fdfb00', '#8314fd', '#b8009c', '#fa60fd', '#fa0000', '#e64200', '#0093f0', '#fda0c0'],
-  currentColor: '#0093f0',
-  addCount: 0,
-  lastAverage: 0,
-  circles: [],
-  initialized: false,
-  init: function() {
-    for ( var z = 0; z < 10; z++ ) {
-      bigPulseState.circles[z] = {
-        c: '', r: 0, a: 0
-      }
-    }
-    bigPulseState.currentColor = bigPulseState.colors[utils.intRandom(0,bigPulseState.colors.length)];
-    bigPulseState.initialized = true;
-  }
-};
-
-var connectedParticlesState = {
-  canvasWidth: 0,
-  canvasHeight: 0,
-  fftSize: 512,
-  particles: [],
-  particleNum: 128,
-  colors: ['#F35D4F','#f36849','#C0D988','#6DDAF1','#F1E85B', '706DF3'],
-
-  initialized: false,
-  divisor: function () {
-    var rc = 4;
-    if (( connectedParticlesState.canvasHeight < 550 ) || ( connectedParticlesState.canvasWidth < 801 )) {
-      rc = 8;
-    }
-    if (( connectedParticlesState.canvasHeight < 351 ) || ( connectedParticlesState.canvasWidth < 501 )) {
-      rc = 16;
-    }
-    if (( connectedParticlesState.canvasHeight < 251 ) || ( connectedParticlesState.canvasWidth < 301 )) {
-      rc = 32;
-    }
-
-    return rc;
-  },
-  init: function(width, height) {
-
-    // internal Object Particle.
-    function Particle() {
-      this.x = Math.round(Math.random() * connectedParticlesState.canvasWidth);
-      this.y = Math.round(Math.random() * connectedParticlesState.canvasHeight);
-      this.rad = Math.round(Math.random() * 10) + 15;
-      this.rgba = connectedParticlesState.colors[utils.intRandom(0,connectedParticlesState.colors.length )];
-      this.vx = Math.round(Math.random() * 3) - 1.5;
-      this.vy = Math.round(Math.random() * 3) - 1.5;
-    }
-
-    connectedParticlesState.particles.length = 0;
-    connectedParticlesState.canvasWidth = width || 1000;
-    connectedParticlesState.canvasHeight = height || 350;
-    var particleDivisor = connectedParticlesState.divisor();
-    connectedParticlesState.particleNum = connectedParticlesState.fftSize / particleDivisor;
-    for( var i = 0; i < connectedParticlesState.particleNum; i++ ) {
-      connectedParticlesState.particles.push(new Particle());
-    }
-    //console.log('connectedParticlesState.init(): fftSize=['+connectedParticlesState.fftSize+'], divisor=['+particleDivisor+'] particles.length=['+connectedParticlesState.particles.length+']');
-
-    connectedParticlesState.initialized = true;
-  }
-
-};
-
-var peakedBarsState = {
-  barSize: 64,
-  bars: [],
-  dots: [],
-  width: 0,
-  height: 0,
-  /*color: //['157, 193, 243', '245, 232, 153', '226, 51, 110' ], */
-  colors: ['0,47,229', '5,223,230', '11,231,70', '157, 193, 243', '245, 232, 153', '226, 51, 110', '206,233,20', '233,180,23', '234,102,26', '241,90,17', '248,51,9' ],
-  initialized: false,
-
-  init: function(width, height) {
-    peakedBarsState.width = width;
-    peakedBarsState.height = height;
-    peakedBarsState.bars.length = 0; // empty the array
-    peakedBarsState.dots.length = 0; // empty the array
-    var barWidth = Math.floor(width/ peakedBarsState.barSize);
-    for( var i = 0; i < peakedBarsState.barSize; i++ ) {
-      peakedBarsState.dots[i] = 0;
-      peakedBarsState.bars[i] = {
-        x: (i * barWidth),
-        w: barWidth,
-        h: 0,
-        color: peakedBarsState.colors[Math.floor(Math.random() * peakedBarsState.colors.length)]
-      }
-    }
-    peakedBarsState.initialized = true;
-  }
-};
-
-var radialBarsState = {
-  arcSize: 18,
-  arcs: [],
-  dots: [],
-  colors: ['5,223,230', '0,47,229', '234,102,26', '11,231,70', '248,51,9', '157, 193, 243', '245, 232, 153', '226, 51, 110', '206,233,20', '233,180,23',  '241,90,17'],
-  initialized: false,
-
-  init: function(width, height) {
-    var arcCount = 60;
-    radialBarsState.width = width;
-    radialBarsState.height = height;
-    radialBarsState.arcs.length = 0; // empty the array
-    radialBarsState.dots.length = 0; // empty the array
-    for( var i = 0; i < arcCount; i++ ) {
-      radialBarsState.dots[i] = 0;
-      radialBarsState.arcs[i] = {
-        startAngle: 0,
-        endAngle: 0,
-        h: 0,
-        color: radialBarsState.colors[utils.intRandom(0, i* radialBarsState.colors.length) % radialBarsState.colors.length]
-      }
-    }
-
-    radialBarsState.initialized = true;
-  },
-  randomizeColors: function() {
-    var arc;
-    for( var i = 0; i < radialBarsState.arcs.length; i++ ) {
-      arc = radialBarsState.arcs[i];
-      arc.color = radialBarsState.colors[utils.intRandom(0, i* radialBarsState.colors.length) % radialBarsState.colors.length];
-    }
-  }
-};
-
-var lifeLineState = {
-  lastValue: [],
-  separate: [],
-  separateTimer: 0,
-  shadowBlur: 0,
-  average: 0,
-  color: {},
-  choice: 0,
-  initialized: false,
-
-  init: function() {
-    for (var i = 0; i < 256; i++) {
-      lifeLineState.lastValue[i] = 0;
-    }
-    lifeLineState.color = {
-      r: 100,
-      g: 100,
-      b: 100,
-      rS: utils.intRandom(1, 3),
-      gS: utils.intRandom(1, 3),
-      bS: utils.intRandom(1, 3),
-      rD: 1,
-      gD: 1,
-      bD: 1
-    };
-    lifeLineState.initialized = true;
-  },
-  scaleFactor: function(height) {
-    var rc = 80; //
-    if ( height > 360 ) {
-      var baseThreshold = rc; // @ height 360
-      var percentage = (height / baseThreshold) / 100;
-      var ratio = parseInt( height * percentage );
-      rc = (baseThreshold - ratio) + 10;
-    }
-    return rc;
-  },
-  changeColor: function() {
-    lifeLineState.choice = utils.intRandom(0, 9);
-    if (lifeLineState.choice < 3) {
-      lifeLineState.color.r = lifeLineState.color.r + lifeLineState.color.rS * lifeLineState.color.rD;
-      if (lifeLineState.color.r > 225) {
-        lifeLineState.color.rD = -1;
-      } else if (lifeLineState.color.r < 100) {
-        lifeLineState.color.rD = 1;
-      }
-    } else if (lifeLineState.choice < 6) {
-      lifeLineState.color.g = lifeLineState.color.g + lifeLineState.color.gS * lifeLineState.color.gD;
-      if (lifeLineState.color.g > 225) {
-        lifeLineState.color.gD = -1;
-      } else if (lifeLineState.color.g < 100) {
-        lifeLineState.color.gD = 1;
-      }
-    } else {
-      lifeLineState.color.b = lifeLineState.color.b + lifeLineState.color.bS * lifeLineState.color.bD;
-      if (lifeLineState.color.b > 225) {
-        lifeLineState.color.bD = -1;
-      } else if (lifeLineState.color.b < 100) {
-        lifeLineState.color.bD = 1;
-      }
-    }
-  }
-};
-
-
-var triangleState = {
-  beginAngle: 0,
-  stars: new Array(512),
-  MAX_DEPTH: 32,
-  initialized: false,
-
-
-  init: function() {
-
-    for( var i = 0; i < triangleState.stars.length; i++ ) {
-      triangleState.stars[i] = {
-        x: utils.intRandom(-25,25),
-        y: utils.intRandom(-25,25),
-        z: utils.intRandom(1,triangleState.MAX_DEPTH)
-      }
-    }
-    triangleState.initialized = true;
-  }
-
-};
-                
-var sinWaveState = {
-  sinAngle: [],
-  line: [],
-  len: 512 / 2 - 20, // smallest fft size
-  color: 0,
-  initialized: false,
-
-  sinWaveColor: function(context, width, height) {
-    if ( !context ) { return; }
-    sinWaveState.color = context.createLinearGradient(0, 0, 0, height);
-    sinWaveState.color.addColorStop(0.1, '#ff5614');
-    sinWaveState.color.addColorStop(0.3, '#fffa47');
-    sinWaveState.color.addColorStop(0.4, '#f93b04');
-    sinWaveState.color.addColorStop(0.5, '#f93b04');
-    sinWaveState.color.addColorStop(0.6, '#fffa47');
-    sinWaveState.color.addColorStop(0.7, '#f93b04');
-    sinWaveState.color.addColorStop(0.75, '#f01800');
-    sinWaveState.color.addColorStop(0.8, '#fb7220');
-    sinWaveState.color.addColorStop(0.9, '#f93b04');
-    sinWaveState.color.addColorStop(1, '#f01800');
-  },
-  init: function(context, width, height) {
-    var angleGap = Math.random() * 0.01 + 0.05,
-      angle = 0;
-
-    sinWaveState.sinAngle.length = 0;
-    sinWaveState.sinAngle[0] = Math.sin(angle);
-    for ( var i = 1; i < sinWaveState.len; i++ ) {
-      sinWaveState.sinAngle[i] = Math.sin(angle);
-      if((sinWaveState.sinAngle[i-1] > 0 && sinWaveState.sinAngle[i] < 0) ||
-         (sinWaveState.sinAngle[i-1] < 0 && sinWaveState.sinAngle[i] > 0)) {
-        angleGap = Math.random() * 0.01 + 0.05;
-      }
-      angle += angleGap;
-    }
-    sinWaveState.sinWaveColor(context, width, height);
-    sinWaveState.initialized = true;
-  }
-};
-
-var mp3player = {
   /* drawDots: Draws the visualizer as dots */
   drawDots: function(data) {
     var radius = 4;
@@ -574,7 +563,6 @@ var mp3player = {
       mp3player.ctx1.stroke();
     }
   },
-  
   /* drawInvertedBars: draws visualizer as two sets inverted on each other  */
   drawInvertedBars: function(data) {
     var spacer_width = 10;
@@ -595,7 +583,6 @@ var mp3player = {
       mp3player.ctx1.fillRect(i * spacer_width, 0 , bar_width, value );
     }
   },
-
   /* drawRadialBars: Draws visualizer as bars radiating from the center of the canvas */
   drawRadialBars: function(data) {
     var centerX = parseInt(mp3player.canvasWidth / 2, 10);
@@ -627,7 +614,6 @@ var mp3player = {
 
     }
   },
-
   /* drawBigPulse: Draws the visualizer as a pulse that emits radials */
   drawBigPulse: function(data) {
     var stateVars = bigPulseState;
@@ -686,7 +672,6 @@ var mp3player = {
     }
     stateVars.lastAvarage = average;
   },
-
   /* drawConnectedParticles: draws visualizer as a particles with connected limbs of related particles */
   drawConnectedParticles: function(data) {
     var stateVars = connectedParticlesState;
@@ -738,7 +723,6 @@ var mp3player = {
       if(p.y < -p.rad) p.y = mp3player.canvasHeight;
     }
   },
-
   /* drawPeakedBars: draws visualizer as a bars with peaked decaying points */
   drawPeakedBars: function(data) {
     var stateVars = peakedBarsState;
@@ -770,7 +754,6 @@ var mp3player = {
       total += data[iData];
     }
   },
-  
   /* drawLifeLine: draws visualizer that appears like a EKG life line */
   drawLifeLine: function(data) {
     var gradients = [mp3player.barGradient, mp3player.rgbGradient, mp3player.hotGradient];
@@ -857,8 +840,6 @@ var mp3player = {
     mp3player.ctx1.lineTo(mp3player.canvasWidth, middle);
     mp3player.ctx1.stroke();
   },
-
-
   /* drawTriangles: draws visualizer as rotating triangles */
   drawTriangles: function(data) {
     var stateVars = triangleState;
@@ -908,7 +889,6 @@ var mp3player = {
     }
     stateVars.beginAngle = (stateVars.beginAngle + 0.00001 * total) % twoPI;
   },
-
   /* drawSinWave:  draws visualizer as a sin wave */
   drawSinWave: function(data) {
     var stateVars = sinWaveState;
@@ -937,7 +917,6 @@ var mp3player = {
     mp3player.ctx1.quadraticCurveTo(x, halfH - stateVars.line[i], x + gap, halfH - stateVars.line[i+1]);
     mp3player.ctx1.stroke();
   },
-
   /* drawRadialPeaks:  Draw circled clock graph, inspired by the Apple Watch */
   drawRadialPeaks: function(data) {
     var stateVars = radialBarsState;
@@ -1018,8 +997,6 @@ var mp3player = {
       done = (radius < lineWidth);
     }
   },
-
-
   /* setupPatterns: places all the patterns into an array that will be cycled through at playtime  */
   setupPatterns: function () {
     mp3player.patterns.push(mp3player.drawCrossBars);          // 0
@@ -1035,7 +1012,6 @@ var mp3player = {
     mp3player.patterns.push(mp3player.drawSinWave);            // 10
     mp3player.patterns.push(mp3player.drawRadialPeaks);        // 11
   },
-
   /* toggleCanvasOrientation: When the pattern changes, assure the proper CSS class are applied */
   toggleCanvasOrientation: function() {
     var gui = document.getElementById('mp3gui');
@@ -1048,7 +1024,6 @@ var mp3player = {
     }
 
   },
-
   /* windowResizeHandler: The Window has resize event - make adjustments */
   windowResizeHandler: function() {
     var tHeight = parseInt(window.innerHeight * 0.60) + '';
@@ -1143,6 +1118,7 @@ var mp3player = {
       mp3player.notifyRestoreAfterBuildBreak();
     });
   },
+
   notifyRestoreAfterBuildBreak: function() {
     console.log( 'notifyRestoreAfterBuildBreak(): mp3 file to be loaded: ' + mp3player.mp3file );
     mp3player.loadMp3File( mp3player.mp3file ); // restore the sound file
@@ -1231,7 +1207,6 @@ var mp3player = {
 
     return grad;
   },
-
   /* getBarGradient2: gradient color */
   getBarGradient2: function () {
     if (!mp3player.ctx1 ) { return; }
@@ -1265,7 +1240,6 @@ var mp3player = {
 
     return grad;
   },
-
   /* init:  main initializer for the mp3player */
   init: function () {
     // invoke the size changes at least once,  make sure all canvas are correct for start up
@@ -1305,7 +1279,77 @@ var mp3player = {
 
 };
 
-                
+////////////////////////////////////////////////////////////////////////////////////////////
+// Kicks off the program start on Window load Event being fired.
+// The first function fired is the init() function nested in the onload()
+window.onload = function () {
+
+  // The ALL_CAPS variables are intended as constants. Change them to change the behavior of the animations
+
+  if ( typeof AudioContext !== "undefined" ) {
+    console.log( 'Supported AudioContext()' );
+  } else if ( typeof webkitAudioContext !== "undefined" ) {
+    console.log( 'Supported webkitAudioContext()' );
+  } else {
+    alert( 'AudioContext not supported. :(' );
+    throw new Error( 'AudioContext not supported. :(' );
+  }
+
+
+  var QUALITY_TO_FONT_SIZE = [10, 20, 50, 100, 200, 350];
+  var QUALITY_TO_SCALE = [20, 14, 6, 3, 1.5, 0.9];
+  var QUALITY_TO_TEXT_POS = [10, 18, 43, 86, 170, 280];
+
+  /* trembling + blur = fun */
+  var TREMBLING = 0;
+  /* 0 - infinity */
+  var FANCY_FONT = "arial";
+  var BACKGROUND = "#001"; // 003
+  var BLENDING = true;
+  /* set false if you prefer rectangles */
+  var ARC = false;
+  /* play with these values */
+  var BLUR = false;
+  var PULSATION = true;
+  var PULSATION_PERIOD = 500;
+  var PARTICLE_RADIUS = 5;
+
+  /* disable blur before using blink */
+  var BLINK = false;
+  var GLOBAL_PULSATION = false;
+  var QUALITY = 2;
+  /* 0 - 5 */
+
+  document.body.style.backgroundColor = BACKGROUND;
+  var titles = ['club', 'nerd!', 'Club', 'Node!'];
+  var itercount = 0;
+  var interval_positions = null;
+  var interval_draw = null;
+
+
+  var canvas = document.getElementById( "clubnode-canvas" );
+  var ctx = canvas.getContext( "2d" );
+
+  var W = canvas.width;
+  var H = canvas.height;
+
+  var tcanvas = document.createElement( "canvas" );
+  var tctx = tcanvas.getContext( "2d" );
+  tcanvas.width = W;
+  tcanvas.height = H;
+
+
+  var total_area = W * H;
+  var total_particles = 2000;
+  var single_particle_area = total_area / total_particles;
+  var area_length = Math.sqrt( single_particle_area );
+  console.log( 'Window.onload(): Area length of ClubNode canvas ' + area_length );
+
+  var particles = [];
+  for ( var i = 1; i <= total_particles; i++ ) {
+    particles.push( new ParticleEl( i ) );
+  }
+
   function ParticleEl( i ) {
     this.r = Math.round( Math.random() * 255 | 0 );
     this.g = Math.round( Math.random() * 255 | 0 );
@@ -1502,77 +1546,4 @@ var mp3player = {
   //init the page.
   init();
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// Kicks off the program start on Window load Event being fired.
-// The first function fired is the init() function nested in the onload()
-window.onload = function () {
-
-  // The ALL_CAPS variables are intended as constants. Change them to change the behavior of the animations
-
-  if ( typeof AudioContext !== "undefined" ) {
-    console.log( 'Supported AudioContext()' );
-  } else if ( typeof webkitAudioContext !== "undefined" ) {
-    console.log( 'Supported webkitAudioContext()' );
-  } else {
-    alert( 'AudioContext not supported. :(' );
-    throw new Error( 'AudioContext not supported. :(' );
-  }
-
-
-  var QUALITY_TO_FONT_SIZE = [10, 20, 50, 100, 200, 350];
-  var QUALITY_TO_SCALE = [20, 14, 6, 3, 1.5, 0.9];
-  var QUALITY_TO_TEXT_POS = [10, 18, 43, 86, 170, 280];
-
-  /* trembling + blur = fun */
-  var TREMBLING = 0;
-  /* 0 - infinity */
-  var FANCY_FONT = "arial";
-  var BACKGROUND = "#001"; // 003
-  var BLENDING = true;
-  /* set false if you prefer rectangles */
-  var ARC = false;
-  /* play with these values */
-  var BLUR = false;
-  var PULSATION = true;
-  var PULSATION_PERIOD = 500;
-  var PARTICLE_RADIUS = 5;
-
-  /* disable blur before using blink */
-  var BLINK = false;
-  var GLOBAL_PULSATION = false;
-  var QUALITY = 2;
-  /* 0 - 5 */
-
-  document.body.style.backgroundColor = BACKGROUND;
-  var titles = ['club', 'nerd!', 'Club', 'Node!'];
-  var itercount = 0;
-  var interval_positions = null;
-  var interval_draw = null;
-
-
-  var canvas = document.getElementById( "clubnode-canvas" );
-  var ctx = canvas.getContext( "2d" );
-
-  var W = canvas.width;
-  var H = canvas.height;
-
-  var tcanvas = document.createElement( "canvas" );
-  var tctx = tcanvas.getContext( "2d" );
-  tcanvas.width = W;
-  tcanvas.height = H;
-
-
-  var total_area = W * H;
-  var total_particles = 2000;
-  var single_particle_area = total_area / total_particles;
-  var area_length = Math.sqrt( single_particle_area );
-  console.log( 'Window.onload(): Area length of ClubNode canvas ' + area_length );
-
-  var particles = [];
-  for ( var i = 1; i <= total_particles; i++ ) {
-    particles.push( new ParticleEl( i ) );
-  }
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////
