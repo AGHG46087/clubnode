@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html >
-  <head>
-    <link rel='stylesheet' href='./css/clubnode-style.css' />
+<head>
+    <base href="/" />
+    <link rel='stylesheet' href='/css/clubnode-style.css' type='text/css' />
   </head>
   <body>
     <div id="gui" class='hide' >&nbsp;
@@ -13,17 +14,6 @@
     </div>
     <label for='mp3file' class="mp3player hide">File</label>
     <select id="mp3file" class="mp3player hide">
-      <option value=0 data-file='null' >none</option>
-      <option value=1 data-file='Santana_Europa.mp3' >Europa - Santana</option>
-      <option value=2 data-file='Santana_EvilWays.mp3'>Evil Ways - Santana</option>
-      <option value=3 data-file='Santana_Smooth.mp3'>Smooth - Santana</option>
-      <option value=4 data-file='Santana_CorazonEspinado.mp3'>Corazon Espinado - Santana</option>
-      <option value=5 data-file='Santana_BlackMagicWoman.mp3'>Black Magic Woman - Santana</option>
-      <option value=6 data-file='PowerStation_GetItOn.mp3'>Get it on - Power Station</option>
-      <option value=7 data-file='GoldenEaring_RadarLove.mp3'>Radar Love - Golden Earing</option>
-      <option value=8 data-file='SistersOfMercy_MotherRussia.mp3'>Mother Russia - Sisters of Mercy</option>
-      <option value=9 data-file='PeterGabriel_Sledgehammer.mp3'>Sledge Hammer - Peter Gabriel</option>
-      <option value=10 data-file='PeterGabriel_BigTime.mp3'>Big Time - Peter Gabriel</option>
     </select>
     <label for='visual-graph' class="mp3player hide">Visualizer</label>
     <select id="visual-graph" class="mp3player hide">
@@ -59,8 +49,6 @@
       <div id='current-time'>&nbsp;</div>
     </div>
 
-
-
-    <script type='text/javascript' src='./js/clubnode.js' ></script>
+    <script type='text/javascript' src='/js/clubnode.js' ></script>
   </body>
 </html>
