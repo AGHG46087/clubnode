@@ -1,0 +1,30 @@
+{
+  "name": "clubnode",
+  "version": "1.0.0",
+  "description": "Simple ExpressJS app to serve music for listening and visualizing",
+  "main": "app.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AGHG46087/clubnode.git"
+  },
+  "keywords": [
+    "expressjs",
+    "nodejs",
+    "serve",
+    "music",
+    "in",
+    "express"
+  ],
+  "author": "@AGHG46087",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AGHG46087/clubnode/issues"
+  },
+  "homepage": "https://github.com/AGHG46087/clubnode#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
