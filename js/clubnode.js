@@ -419,6 +419,7 @@ var mp3player = {
         if (audioEl) {
             var parent = audioEl.parentElement;
             //            if (parent) { parent.removeChild(audioEl); }
+        }
         // window.audio = null;
         var currentTimeNode = document.getElementById('current-time');
         if (currentTimeNode) { currentTimeNode.innerHTML = '&nbsp;'; }
@@ -1007,6 +1008,7 @@ var mp3player = {
         mp3player.currTime = currTime;
     },
     songSelectHandler: function() {
+
         if (mp3player.audioPlaying) {
             mp3player.resetLifeUniverseAndEverything();
         }
@@ -1014,6 +1016,7 @@ var mp3player = {
         var selectedIdx = this.selectedIndex;
         console.log('MP3 Change: ' + selectedIdx + ': ' + this[selectedIdx].getAttribute('data-file'));
         if (selectedIdx > -1) {
+            //                mp3player.mp3file = window.location.origin + '/music?id=' + this[selectedIdx].getAttribute('data-file');
             mp3player.mp3file = `${window.location.origin}/music?id=${this[selectedIdx].getAttribute('data-file')}`;
             console.log('setupControlListeners.addEventListener(): mp3 file to be loaded: ' + mp3player.mp3file);
             mp3player.loadMp3File(mp3player.mp3file);
@@ -1025,6 +1028,7 @@ var mp3player = {
     },
     /* setupAudioListeners: listeners on the audio element */
     setupAudioListeners: function() {
+        audio.addEventListener('timeupdate', this.timeUpdateHandler);
         audio.addEventListener('ended', this.audioEndedHandler);
     },
     /* setupControlListeners: listeners on the control elements */
