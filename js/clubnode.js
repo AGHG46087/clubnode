@@ -397,8 +397,8 @@ var mp3player = {
     resetLifeUniverseAndEverything: function() {
         // Stop the Audio player and remove listeners
         window.audio.pause();
-        window.audio.removeEventListener('timeupdate');
-        window.audio.removeEventListener('ended');
+        window.audio.removeEventListener('timeupdate', this.timeUpdateHandler);
+        window.audio.removeEventListener('ended', this.audioEndedHandler);
 
         mp3player.audioPlaying = false;
 
@@ -416,82 +416,17 @@ var mp3player = {
 
         try {
             // Remove the existing Audio element from the DOM
-            var parent = document.getElementById('visualizer');
-            parent.removeChild(window.audio);
+            // GEEK:  What the hell is going on here.
+            var audioEl = document.getElementById('audio-player');
+            var parent = audioEl.parentElement;
+            if (parent) { parent.removeChild(audioEl); }
         } catch (e) {
             console.log('%cFailed to remove audio node from visualizer, it is not present:', "color:orange; background:blue; font-size: 12px");
         }
         // window.audio = null;
+        var currentTimeNode = document.getElementById('current-time');
+        if (currentTimeNode) { currentTimeNode.innerHTML = '&nbsp;'; }
 
-    },
-    /* closeSocket: closes the socket connection to the web socket server */
-    closeSocket: function() {
-        if (mp3player.connection) {
-            mp3player.connection.close();
-            mp3player.connection = null;
-        }
-
-        var elMsg = document.getElementById('loadMsg');
-
-        var ipAddress = document.getElementById('ipAddress');
-        var tmpValue = ipAddress.value;
-        ipAddress.value = ''; // clear it out
-        if (tmpValue.length > 1) {
-            var value = 'ws://' + tmpValue + ':1234';
-            elMsg.innerHTML = 'Closed socket ' + value + ' ...';
-        }
-
-        setTimeout(function() { elMsg.innerHTML = '&nbsp;'; }, 2000);
-    },
-    /* connectSocket: requests a Web socket connection and setup listeners on the socket */
-    connectSocket: function(url) {
-        console.log('Requesting to connect to url=[' + url + ']');
-        var elMsg = document.getElementById('loadMsg');
-        window.WebSocket = window.WebSocket || window.MozWebSocket;
-        mp3player.connection = new WebSocket(url); //'ws://127.0.0.1:1234'
-
-        // connection is opened and ready to use
-        mp3player.connection.onopen = function() {
-            elMsg.innerHTML = 'Open socket connection to ' + url + ' ...';
-            setTimeout(function() { elMsg.innerHTML = '&nbsp;'; }, 2000);
-            console.log('%cmp3player.connectSocket,onopen(): Connection established to url=[' + url + ']', "color:cyan; background:blue; font-size: 12px");
-        };
-        // connection is opened and ready to use
-        mp3player.connection.onmessage = function(evt) {
-            var tempData = evt.data;
-            if (tempData.indexOf('Build-break') > -1) {
-                console.log('%cmp3player.connectSocket.onmessage(): Build Break msg: %s', "color:yellow; background:red; font-size: 16px", tempData);
-                mp3player.notifyBuildBreak(tempData);
-            } else {
-                console.log('%cmp3player.connectSocket,onmessage(): Message received msg=[%s]', "color:white; background:blue; font-size: 12px", tempData);
-            }
-        };
-        // connection is opened closed
-        mp3player.connection.onclose = function() {
-            if (!utils.hasClass('error', elMsg)) {
-                elMsg.innerHTML = 'Closed socket to ' + url + ' ...';
-                setTimeout(function() { elMsg.innerHTML = '&nbsp;'; }, 2000);
-            }
-            console.log('%cmp3player.connectSocketonclose(): Server requested Connection to url=[' + url + '] closed for business', "color:orange; background:blue; font-size: 12px");
-            mp3player.connection = null;
-        };
-        // an error occurred when sending/receiving data
-        mp3player.connection.onerror = function(error) {
-            utils.addClass('error', elMsg);
-            elMsg.innerHTML = 'WebSocket Error: to ' + url + ' ... Check Connection!!';
-            setTimeout(function() {
-                utils.removeClass('error', elMsg);
-                elMsg.innerHTML = '&nbsp;';
-            }, 2000);
-            console.log('%cmp3player.connectSocket.onerror(): An Error ocurred when sending/receiving data=[' + error + ']', "color:yellow; background:red; font-size: 16px");
-        };
-    },
-    /* sendData:  Sends the fft data to the web socket server */
-    sendData: function(data) {
-        // Sending data to the server if the connection is established
-        if (mp3player.connection) {
-            mp3player.connection.send(data);
-        }
     },
     /* animationFrameCallback:  This is the function that is called 60fps pulls fft data, invokes methods to send data and draw */
     animationFrameCallback: function() {
@@ -499,9 +434,6 @@ var mp3player = {
 
         var freqByteData = new Uint8Array(mp3player.analyser.frequencyBinCount);
         mp3player.analyser.getByteFrequencyData(freqByteData);
-
-        // send the data to external source
-        mp3player.sendData(freqByteData);
 
         // draw on the canvas, save state, clear rectangle, draw, restore state.
         mp3player.ctx1.globalCompositeOperation = 'source-over';
@@ -512,7 +444,9 @@ var mp3player = {
         mp3player.ctx1.restore();
 
     },
-    /* drawCrossBars: draws visualizer as two crossing images */
+
+    /// LIST of Renderers
+    /* 0. drawCrossBars: draws visualizer as two crossing images */
     drawCrossBars: function(data) {
         var spacer_width = 10;
         var bar_width = 5;
@@ -533,7 +467,7 @@ var mp3player = {
         }
 
     },
-    /* drawSymmetricCentered: draws visualizer as starting from center and draw out to boundries */
+    /* 1. drawSymmetricCentered: draws visualizer as starting from center and draw out to boundries */
     drawSymmetricCentered: function(data) {
         var gradients = [mp3player.barGradient, mp3player.rgbGradient, mp3player.hotGradient, mp3player.dotGradient];
         var color = gradients[parseInt(mp3player.currTime) % gradients.length];
@@ -551,7 +485,7 @@ var mp3player = {
         }
 
     },
-    /* drawDots: Draws the visualizer as dots */
+    /* 2. drawDots: Draws the visualizer as dots */
     drawDots: function(data) {
         var radius = 4;
         var value = 0;
@@ -568,7 +502,7 @@ var mp3player = {
             mp3player.ctx1.stroke();
         }
     },
-    /* drawInvertedBars: draws visualizer as two sets inverted on each other  */
+    /* 3. drawInvertedBars: draws visualizer as two sets inverted on each other  */
     drawInvertedBars: function(data) {
         var spacer_width = 10;
         var bar_width = 5;
@@ -588,7 +522,7 @@ var mp3player = {
             mp3player.ctx1.fillRect(i * spacer_width, 0, bar_width, value);
         }
     },
-    /* drawRadialBars: Draws visualizer as bars radiating from the center of the canvas */
+    /* 4. drawRadialBars: Draws visualizer as bars radiating from the center of the canvas */
     drawRadialBars: function(data) {
         var centerX = parseInt(mp3player.canvasWidth / 2, 10);
         var centerY = parseInt(mp3player.canvasHeight / 2, 10);
@@ -619,7 +553,7 @@ var mp3player = {
 
         }
     },
-    /* drawBigPulse: Draws the visualizer as a pulse that emits radials */
+    /* 5. drawBigPulse: Draws the visualizer as a pulse that emits radials */
     drawBigPulse: function(data) {
         var stateVars = bigPulseState;
         var i, len, maxWidth;
@@ -679,7 +613,7 @@ var mp3player = {
         }
         stateVars.lastAvarage = average;
     },
-    /* drawConnectedParticles: draws visualizer as a particles with connected limbs of related particles */
+    /* 6. drawConnectedParticles: draws visualizer as a particles with connected limbs of related particles */
     drawConnectedParticles: function(data) {
         var stateVars = connectedParticlesState;
         var p, p2, i, j, len, factor, total, avg;
@@ -730,7 +664,7 @@ var mp3player = {
             if (p.y < -p.rad) p.y = mp3player.canvasHeight;
         }
     },
-    /* drawPeakedBars: draws visualizer as a bars with peaked decaying points */
+    /* 7. drawPeakedBars: draws visualizer as a bars with peaked decaying points */
     drawPeakedBars: function(data) {
         var stateVars = peakedBarsState;
         var total = 0,
@@ -762,7 +696,7 @@ var mp3player = {
             total += data[iData];
         }
     },
-    /* drawLifeLine: draws visualizer that appears like a EKG life line */
+    /* 8. drawLifeLine: draws visualizer that appears like a EKG life line */
     drawLifeLine: function(data) {
         var gradients = [mp3player.barGradient, mp3player.rgbGradient, mp3player.hotGradient];
         var color = gradients[parseInt(mp3player.currTime) % gradients.length]; // mp3player.rgbGradient; //mp3player.hotGradient;
@@ -813,7 +747,7 @@ var mp3player = {
         var scaleFactor = stateVars.scaleFactor(mp3player.canvasHeight); // 80;
 
         for (i = 0; i < 128; i++) {
-            y = data[i] - (100 - i) * 0.5; // GEEK
+            y = data[i] - (100 - i) * 0.5; // NERD
             y = (y - scaleFactor) < 0 ? 0 : y - scaleFactor;
             if (y > middle) {
                 y = middle;
@@ -848,7 +782,7 @@ var mp3player = {
         mp3player.ctx1.lineTo(mp3player.canvasWidth, middle);
         mp3player.ctx1.stroke();
     },
-    /* drawTriangles: draws visualizer as rotating triangles */
+    /* 9. drawTriangles: draws visualizer as rotating triangles */
     drawTriangles: function(data) {
         var stateVars = triangleState;
         var angle = stateVars.beginAngle,
@@ -898,7 +832,7 @@ var mp3player = {
         }
         stateVars.beginAngle = (stateVars.beginAngle + 0.00001 * total) % twoPI;
     },
-    /* drawSinWave:  draws visualizer as a sin wave */
+    /* 10. drawSinWave:  draws visualizer as a sin wave */
     drawSinWave: function(data) {
         var stateVars = sinWaveState;
         var halfH = mp3player.canvasHeight / 2,
@@ -927,7 +861,7 @@ var mp3player = {
         mp3player.ctx1.quadraticCurveTo(x, halfH - stateVars.line[i], x + gap, halfH - stateVars.line[i + 1]);
         mp3player.ctx1.stroke();
     },
-    /* drawRadialPeaks:  Draw circled clock graph, inspired by the Apple Watch */
+    /* 11. drawRadialPeaks:  Draw circled clock graph, inspired by the Apple Watch */
     drawRadialPeaks: function(data) {
         var stateVars = radialBarsState;
         var colors = stateVars.colors,
@@ -1068,33 +1002,44 @@ var mp3player = {
         console.log('mp3player.windowResizeHandler(): width=[' + mp3player.canvasWidth + '], height=[' + mp3player.canvasHeight + ']');
 
     },
+    timeUpdateHandler: function() {
+        var currentTimeNode = document.getElementById('current-time');
+        var currTime = audio.currentTime;
+        var seconds = ('0' + parseInt(currTime % 60));
+        if (seconds.length > 2) { seconds = seconds.substring(1); }
+        currentTimeNode.textContent = parseInt(currTime / 60) + ':' + seconds;
+        mp3player.currTime = currTime;
+    },
+    songSelectHandler: function() {
+        if (mp3player.audioPlaying) {
+            mp3player.resetLifeUniverseAndEverything();
+        }
+        mp3player.mp3file = null;
+        var selectedIdx = this.selectedIndex;
+        console.log('MP3 Change: ' + selectedIdx + ': ' + this[selectedIdx].getAttribute('data-file'));
+        if (selectedIdx > -1) {
+            // GEEK               mp3player.mp3file = './music/' + this[this.value].getAttribute('data-file');
+            //                mp3player.mp3file = window.location.origin + '/music?id=' + this[selectedIdx].getAttribute('data-file');
+            mp3player.mp3file = `${window.location.origin}/music?id=${this[selectedIdx].getAttribute('data-file')}`;
+            console.log('setupControlListeners.addEventListener(): mp3 file to be loaded: ' + mp3player.mp3file);
+            mp3player.loadMp3File(mp3player.mp3file);
+        }
+    },
+    audioEndedHandler: function() {
+        console.log('Audio ended event');
+        mp3player.resetLifeUniverseAndEverything();
+    },
     /* setupAudioListeners: listeners on the audio element */
     setupAudioListeners: function() {
-        var currentTimeNode = document.getElementById('current-time');
-        audio.addEventListener('timeupdate', function() {
-            var currTime = audio.currentTime;
-            var seconds = ('0' + parseInt(currTime % 60));
-            if (seconds.length > 2) { seconds = seconds.substring(1); }
-            currentTimeNode.textContent = parseInt(currTime / 60) + ':' + seconds;
-            mp3player.currTime = currTime;
-        });
-        audio.addEventListener('ended', function() {
-            console.log('Audio ended event');
-            mp3player.closeSocket();
-            mp3player.resetLifeUniverseAndEverything();
-            currentTimeNode.innerHTML = '&nbsp;';
-        });
+
+        audio.addEventListener('timeupdate', this.timeUpdateHandler);
+
+        audio.addEventListener('ended', this.audioEndedHandler);
     },
     /* setupControlListeners: listeners on the control elements */
     setupControlListeners: function() {
-        document.getElementById('mp3file').addEventListener('change', function() {
-            mp3player.mp3file = null;
-            if (this.value > 0) {
-                mp3player.mp3file = './music/' + this[this.value].getAttribute('data-file');
-                console.log('setupControlListeners.addEventListener(): mp3 file to be loaded: ' + mp3player.mp3file);
-                mp3player.loadMp3File(mp3player.mp3file);
-            }
-        });
+        document.getElementById('mp3file').addEventListener('change', this.songSelectHandler);
+
         document.getElementById('visual-graph').addEventListener('change', function() {
             var value = parseInt(this.value);
             mp3player.PATTERN_CYCLE_ALL = (value === -1);
@@ -1103,18 +1048,6 @@ var mp3player = {
             mp3player.toggleCanvasOrientation();
             //console.log('setupControlListeners.addEventListener(): Visual-Graph drop down: Cycle All Patterns=['+mp3player.PATTERN_CYCLE_ALL+'], index=['+mp3player.PATTERN_START_INDEX+']=['+this[value+1].label+']. ');
         });
-        document.getElementById('btnConnect').addEventListener('click', function() {
-            if (mp3player.connection) {
-                mp3player.closeSocket();
-                return;
-            }
-            var ipAddress = document.getElementById('ipAddress');
-            var tmpValue = ipAddress.value;
-            if (tmpValue.length < 1) { return; }
-            var value = 'ws://' + tmpValue + ':1234';
-            mp3player.connectSocket(value);
-            console.log('setupControlListeners.addEventListener(): Connected Socket to=[' + value + '], socket=[' + mp3player.connection + ']')
-        });
         document.getElementById('btnStartMp3').addEventListener('click', function() {
             if (mp3player.audioPlaying === true) {
                 mp3player.pause();
@@ -1122,33 +1055,8 @@ var mp3player = {
                 mp3player.start();
             }
         });
-        document.getElementById('loadMsg').addEventListener('webkitAnimationEnd', function() {
-            console.log('Animation end');
-            mp3player.notifyRestoreAfterBuildBreak();
-        });
     },
 
-    notifyRestoreAfterBuildBreak: function() {
-        console.log('notifyRestoreAfterBuildBreak(): mp3 file to be loaded: ' + mp3player.mp3file);
-        mp3player.loadMp3File(mp3player.mp3file); // restore the sound file
-        audio.addEventListener('canplay', function() {
-            mp3player.start();
-            audio.removeEventListener('canplay');
-        });
-        var el = document.getElementById('loadMsg');
-        utils.removeClass('msg-alert', el);
-        setTimeout(function() { el.innerHTML = '&nbsp;'; }, 2000);
-    },
-    notifyBuildBreak: function(msg) {
-        var soundFile = './music/zzbuildbreak.mp3';
-        mp3player.loadMp3File(soundFile, true);
-        audio.autoplay = true;
-        var el = document.getElementById('loadMsg');
-        el.innerHTML = msg || 'Build Break';
-        utils.addClass('msg-alert', el);
-        mp3player.sendData('ACK: ' + msg);
-        console.log('notifyBuildBreak(): mp3 file to be loaded: ' + soundFile);
-    },
     /* getDotGradient: gradient color */
     getDotGradient: function() {
         if (!mp3player.ctx1) { return; }
@@ -1533,14 +1441,14 @@ window.onload = function() {
         }
     }
 
-    function buildOptionList(listArr) {
+    function buildMusicOptionList(listArr) {
         var fileName;
         var friendlyName;
         var select = document.getElementById('mp3file');
 
         var opt = document.createElement("OPTION");
         opt.setAttribute('value', '-1');
-        opt.setAttribute('data-file', 'null');
+        opt.setAttribute('data-file', 'NA_None');
         opt.innerHTML = 'none';
         select.appendChild(opt);
 
@@ -1548,8 +1456,8 @@ window.onload = function() {
             fileName = listArr[i];
             friendlyName = fileName.substring(0, fileName.indexOf('.mp3')).replace('_', ' ');
             opt = document.createElement("OPTION");
-            opt.setAttribute('value', `'${i}'`);
-            opt.setAttribute('data-file', `'${fileName}'`);
+            opt.setAttribute('value', i); // Do not put the value in string quotes - this is intended to be be number.
+            opt.setAttribute('data-file', fileName);
             opt.innerHTML = friendlyName;
             select.appendChild(opt);
 
@@ -1558,14 +1466,14 @@ window.onload = function() {
     }
 
     function initMusicList() {
-
+        var localURL = window.location.origin + '/list';
         var xhrReq = new XMLHttpRequest();
         xhrReq.addEventListener('load', function() {
-            console.log('listener was called');
+            console.log('Music List request: process response');
             jsonRes = JSON.parse(this.responseText);
-            buildOptionList(jsonRes.items);
+            buildMusicOptionList(jsonRes.items);
         });
-        xhrReq.open('GET', "http://localhost:3003/list");
+        xhrReq.open('GET', localURL);
         xhrReq.send();
 
     }
