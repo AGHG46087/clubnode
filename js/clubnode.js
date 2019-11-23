@@ -319,6 +319,7 @@ var mp3player = {
 
     /* pause: As the name says: pause the audio and animations */
     pause: function() {
+        console.log("Song Paused...");
         audio.pause();
         mp3player.audioPlaying = false;
         window.cancelAnimationFrame(mp3player.animationFrame);
@@ -327,23 +328,13 @@ var mp3player = {
     },
     /* start: kicks off the whole animations and audio */
     start: function() {
+        console.log("Song start...");
         // Make sure we have a Analyser first
         if (mp3player.analyser == null) {
             console.log('%cmp3player.start(): There is no analyser setup - select a new song.', "color:yellow; background:red; font-size: 16px");
             return;
         }
-
-        if (audio && document.getElementById('audio-player') == null) {
-            // The html audio element has been removed and looking to replay the same song, add it to the DOM again
-            window.audio.id = 'audio-player';
-            window.audio.controls = true;
-            window.audio.loop = false;
-            audio.src = mp3player.mp3file;
-
-            var el = document.getElementById('visualizer');
-            el.appendChild(audio);
-            mp3player.setupAudioListeners();
-        }
+        document.getElementById('loadMsg').innerHTML = '&nbsp;';
 
         audio.play();
         mp3player.audioPlaying = true;
@@ -360,20 +351,25 @@ var mp3player = {
         }, 3000);
     },
     /* loadMp3File: When a mp3 is being loaded this will load a audio file, setup event listeners, and connect analyser */
-    loadMp3File: function(url, keepTitle) {
-        var elMsg = document.getElementById('loadMsg');
-        elMsg.innerHTML = 'loading ' + url + ' ...';
-        setTimeout(function() { if (!keepTitle) { elMsg.innerHTML = '&nbsp;'; } }, 2000);
+    loadMp3File: function(url) {
+        console.log("Loading mp3 song: " + url);
+        document.getElementById('loadMsg').innerHTML = 'loading ' + url + ' ...';
 
-        if (window.audio || mp3player.audioPlaying) {
+        if (window.audio && mp3player.audioPlaying) {
             mp3player.resetLifeUniverseAndEverything();
         }
 
-        window.audio = new Audio();
-        window.audio.id = 'audio-player';
-        window.audio.controls = true;
-        window.audio.loop = false;
-        audio.src = url;
+        var audioEl = document.getElementById('audio-player');
+        if (!audioEl) {
+            window.audio = new Audio();
+            window.audio.id = 'audio-player';
+            window.audio.controls = true;
+            window.audio.loop = false;
+            window.audio.type = 'audio/mpeg3';
+        }
+
+        window.audio.src = url;
+        window.audio.load();
 
         var el = document.getElementById('visualizer');
         el.appendChild(audio);
@@ -392,6 +388,8 @@ var mp3player = {
         mp3player.source.connect(mp3player.analyser);
         mp3player.analyser.connect(mp3player.audioCtx.destination);
 
+        mp3player.audioPlaying = false;
+
     },
     /* resetLifeUniverseAndEverything: Everything is stopped for a reason, reset all variables to inital state */
     resetLifeUniverseAndEverything: function() {
@@ -399,8 +397,10 @@ var mp3player = {
         window.audio.pause();
         window.audio.removeEventListener('timeupdate', this.timeUpdateHandler);
         window.audio.removeEventListener('ended', this.audioEndedHandler);
+        //        window.audio.remove();
 
         mp3player.audioPlaying = false;
+        mp3player.audioCtx = null;
 
         // Clear the Animation Frame and pattern switching interval
         window.cancelAnimationFrame(mp3player.animationFrame);
@@ -414,15 +414,11 @@ var mp3player = {
         mp3player.patternIndex = mp3player.PATTERN_START_INDEX;
         mp3player.toggleCanvasOrientation();
 
-        try {
-            // Remove the existing Audio element from the DOM
-            // GEEK:  What the hell is going on here.
-            var audioEl = document.getElementById('audio-player');
+        // Remove the existing Audio element from the DOM if it still exits, audio.remove() should have removed it.
+        var audioEl = document.getElementById('audio-player');
+        if (audioEl) {
             var parent = audioEl.parentElement;
-            if (parent) { parent.removeChild(audioEl); }
-        } catch (e) {
-            console.log('%cFailed to remove audio node from visualizer, it is not present:', "color:orange; background:blue; font-size: 12px");
-        }
+            //            if (parent) { parent.removeChild(audioEl); }
         // window.audio = null;
         var currentTimeNode = document.getElementById('current-time');
         if (currentTimeNode) { currentTimeNode.innerHTML = '&nbsp;'; }
@@ -1018,8 +1014,6 @@ var mp3player = {
         var selectedIdx = this.selectedIndex;
         console.log('MP3 Change: ' + selectedIdx + ': ' + this[selectedIdx].getAttribute('data-file'));
         if (selectedIdx > -1) {
-            // GEEK               mp3player.mp3file = './music/' + this[this.value].getAttribute('data-file');
-            //                mp3player.mp3file = window.location.origin + '/music?id=' + this[selectedIdx].getAttribute('data-file');
             mp3player.mp3file = `${window.location.origin}/music?id=${this[selectedIdx].getAttribute('data-file')}`;
             console.log('setupControlListeners.addEventListener(): mp3 file to be loaded: ' + mp3player.mp3file);
             mp3player.loadMp3File(mp3player.mp3file);
@@ -1031,9 +1025,6 @@ var mp3player = {
     },
     /* setupAudioListeners: listeners on the audio element */
     setupAudioListeners: function() {
-
-        audio.addEventListener('timeupdate', this.timeUpdateHandler);
-
         audio.addEventListener('ended', this.audioEndedHandler);
     },
     /* setupControlListeners: listeners on the control elements */
@@ -1049,6 +1040,7 @@ var mp3player = {
             //console.log('setupControlListeners.addEventListener(): Visual-Graph drop down: Cycle All Patterns=['+mp3player.PATTERN_CYCLE_ALL+'], index=['+mp3player.PATTERN_START_INDEX+']=['+this[value+1].label+']. ');
         });
         document.getElementById('btnStartMp3').addEventListener('click', function() {
+            console.log('start/pause button: playing is: ' + mp3player.audioPlaying);
             if (mp3player.audioPlaying === true) {
                 mp3player.pause();
             } else {
@@ -1191,7 +1183,7 @@ var mp3player = {
         sinWaveState.init(mp3player.ctx1, mp3player.canvasWidth, mp3player.canvasHeight);
         radialBarsState.init(mp3player.canvasWidth, mp3player.canvasHeight);
 
-        console.log('%cmp3player.init(): complete', "color:cyan; background:blue; font-size: 16px");
+        console.log('%cmp3player.init(): complete', "color:cyan; background:blue; font-size: 12px");
     }
 
 };
@@ -1497,10 +1489,24 @@ window.onload = function() {
         skipIntro();
     }
 
+    function windowErrorHandler(message, source, lineno, colno, error) {
+        debugger;
+        console.log("%c%s", "color:cyan; background:blue; font-size: 12px", message);
+        debugger;
+
+    }
+
 
     // future handlings of resize and do it once to start
     window.addEventListener("resize", mp3player.windowResizeHandler);
-    //init the page.
+    window.addEventListener("error", windowErrorHandler);
+    window.onerror = function(message, source, lineno, colno, error) {
+            debugger;
+            console.log("%c%s", "color:cyan; background:blue; font-size: 12px", message);
+            debugger;
+        }
+        //init the page.
     init();
+
 };
 ////////////////////////////////////////////////////////////////////////////////////////////
