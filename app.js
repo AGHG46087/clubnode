@@ -20,9 +20,11 @@ app.get('/music', function(req,res){
 
       var fileId = req.query.id;
       var file = __dirname + '/music/' + fileId;
+      console.log("Streaming file: " + file);
       fs.exists(file,function(exists){
             if(exists)
             {
+              
               var rstream = fs.createReadStream(file);
               rstream.pipe(res);
             }
@@ -57,7 +59,8 @@ app.get('/download', function(req,res){
     });
 
 app.get('/list', function(req,res){
-      console.log('List is called');
+      
+      console.log("List is reqyested from client");
 
 
       var fileId = req.query.id;
@@ -65,23 +68,23 @@ app.get('/list', function(req,res){
       var jsonRes = '';
 
       fs.readdir(path, function(err,items){
-              /*
-                console.log(items);
-                for(var i = 0; i < items.length; i++ ) {
-                console.log(`item[${i}] = ${items[i]}`);
-                }
+              // Sort the new array
+            items.sort();
 
-              */
+              // Creat the json response
             jsonRes += `{ "list" : "/music", "items" : [`;
-                                                          //jsonRes += "{ 'list' : '/music', 'items' : [";
             for(var i = 0; i < items.length; i++ ) {
+              
               jsonRes += `"${items[i]}"`;
+              
               jsonRes += ( i < items.length - 1 ) ? "," : "";
+              
             }
-            
-//            jsonRes = "{ list : '/music', list: [" + items + "] }";
-            jsonRes += "] }";
-            console.log(jsonRes);
+            jsonRes += `] }`;
+
+             // Send the response
+//            console.log(jsonRes);
+            console.log("List sent to client");
             res.send(jsonRes);
             res.end();
 
