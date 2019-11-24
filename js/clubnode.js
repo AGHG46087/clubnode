@@ -35,6 +35,14 @@ var utils = {
     /* distance between two points */
     findDistance: function(p1, p2) {
         return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+    },
+    sleep: function(milliseconds) {
+        var start = new Date().getTime();
+        for (var i = 0; i < 1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds) {
+                break;
+            }
+        }
     }
 };
 
@@ -359,17 +367,15 @@ var mp3player = {
             mp3player.resetLifeUniverseAndEverything();
         }
 
-        var audioEl = document.getElementById('audio-player');
-        if (!audioEl) {
-            window.audio = new Audio();
-            window.audio.id = 'audio-player';
-            window.audio.controls = true;
-            window.audio.loop = false;
-            window.audio.type = 'audio/mpeg3';
-        }
-
-        window.audio.src = url;
+        window.audio = new Audio();
+        window.audio.id = 'audio-player';
+        window.audio.controls = true;
+        window.audio.loop = false;
+        window.audio.autoplay = false;
+        window.audio.type = 'audio/mpeg3';
+        window.audio.auto
         window.audio.load();
+        window.audio.setAttribute('src', url);
 
         var el = document.getElementById('visualizer');
         el.appendChild(audio);
@@ -390,14 +396,16 @@ var mp3player = {
 
         mp3player.audioPlaying = false;
 
+        mp3player.start();
     },
     /* resetLifeUniverseAndEverything: Everything is stopped for a reason, reset all variables to inital state */
     resetLifeUniverseAndEverything: function() {
         // Stop the Audio player and remove listeners
+        console.log("Song Stopped and Removed...");
         window.audio.pause();
         window.audio.removeEventListener('timeupdate', this.timeUpdateHandler);
         window.audio.removeEventListener('ended', this.audioEndedHandler);
-        //        window.audio.remove();
+        window.audio.remove();
 
         mp3player.audioPlaying = false;
         mp3player.audioCtx = null;
@@ -418,11 +426,12 @@ var mp3player = {
         var audioEl = document.getElementById('audio-player');
         if (audioEl) {
             var parent = audioEl.parentElement;
-            //            if (parent) { parent.removeChild(audioEl); }
+            if (parent) { parent.removeChild(audioEl); }
         }
         // window.audio = null;
         var currentTimeNode = document.getElementById('current-time');
         if (currentTimeNode) { currentTimeNode.innerHTML = '&nbsp;'; }
+        utils.sleep(1000);
 
     },
     /* animationFrameCallback:  This is the function that is called 60fps pulls fft data, invokes methods to send data and draw */
@@ -1493,23 +1502,17 @@ window.onload = function() {
         skipIntro();
     }
 
-    function windowErrorHandler(message, source, lineno, colno, error) {
+    function windowErrorHandler(message) {
+        console.log("%cWe have an error", "color:cyan; background:blue; font-size: 12px");
+        console.log(message);
         debugger;
-        console.log("%c%s", "color:cyan; background:blue; font-size: 12px", message);
-        debugger;
-
     }
 
 
     // future handlings of resize and do it once to start
     window.addEventListener("resize", mp3player.windowResizeHandler);
     window.addEventListener("error", windowErrorHandler);
-    window.onerror = function(message, source, lineno, colno, error) {
-            debugger;
-            console.log("%c%s", "color:cyan; background:blue; font-size: 12px", message);
-            debugger;
-        }
-        //init the page.
+    //init the page.
     init();
 
 };
