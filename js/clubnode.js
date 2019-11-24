@@ -395,10 +395,13 @@ var mp3player = {
         mp3player.analyser.connect(mp3player.audioCtx.destination);
 
         mp3player.audioPlaying = false;
+      
+        mp3player.start();
     },
     /* resetLifeUniverseAndEverything: Everything is stopped for a reason, reset all variables to inital state */
     resetLifeUniverseAndEverything: function() {
         // Stop the Audio player and remove listeners
+        console.log("Song Stopped and Removed...");
         window.audio.pause();
         window.audio.removeEventListener('timeupdate', this.timeUpdateHandler);
         window.audio.removeEventListener('ended', this.audioEndedHandler);
