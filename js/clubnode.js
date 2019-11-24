@@ -395,7 +395,7 @@ var mp3player = {
         mp3player.analyser.connect(mp3player.audioCtx.destination);
 
         mp3player.audioPlaying = false;
-
+      
         mp3player.start();
     },
     /* resetLifeUniverseAndEverything: Everything is stopped for a reason, reset all variables to inital state */
