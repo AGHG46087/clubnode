@@ -324,6 +324,8 @@ var mp3player = {
     connection: null,
     PATTERN_CYCLE_ALL: true,
     PATTERN_START_INDEX: 0, // max is patterns.length -1
+    musicList: null,
+    currMusicListIdx: -1,
 
     /* pause: As the name says: pause the audio and animations */
     pause: function() {
@@ -395,7 +397,7 @@ var mp3player = {
         mp3player.analyser.connect(mp3player.audioCtx.destination);
 
         mp3player.audioPlaying = false;
-      
+
         mp3player.start();
     },
     /* resetLifeUniverseAndEverything: Everything is stopped for a reason, reset all variables to inital state */
@@ -1025,6 +1027,7 @@ var mp3player = {
         var selectedIdx = this.selectedIndex;
         console.log('MP3 Change: ' + selectedIdx + ': ' + this[selectedIdx].getAttribute('data-file'));
         if (selectedIdx > -1) {
+            mp3player.currMusicListIdx = selectedIdx;
             //                mp3player.mp3file = window.location.origin + '/music?id=' + this[selectedIdx].getAttribute('data-file');
             mp3player.mp3file = `${window.location.origin}/music?id=${this[selectedIdx].getAttribute('data-file')}`;
             console.log('setupControlListeners.addEventListener(): mp3 file to be loaded: ' + mp3player.mp3file);
@@ -1032,8 +1035,14 @@ var mp3player = {
         }
     },
     audioEndedHandler: function() {
-        console.log('Audio ended event');
-        mp3player.resetLifeUniverseAndEverything();
+        console.log('Audio ended event, Change to next song...');
+        if (++mp3player.currMusicListIdx > mp3player.musicList.length) { mp3player.currMusicListIdx = 1; }
+
+        var selectEl = document.getElementById('mp3file');
+        selectEl.selectedIndex = mp3player.currMusicListIdx;
+        selectEl.dispatchEvent(new Event('change'));
+
+        // mp3player.resetLifeUniverseAndEverything();
     },
     /* setupAudioListeners: listeners on the audio element */
     setupAudioListeners: function() {
@@ -1468,6 +1477,7 @@ window.onload = function() {
 
             console.log(opt.outerHTML);
         }
+        mp3player.musicList = listArr;
     }
 
     function initMusicList() {
