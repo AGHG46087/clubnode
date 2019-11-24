@@ -26,6 +26,7 @@ app.get('/music', function(req,res){
             if(exists)
             {
               
+              res.setHeader('Content-Type', 'application/audio/mpeg3');
               var rstream = fs.createReadStream(file);
               rstream.pipe(res);
             }
