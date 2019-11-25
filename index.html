@@ -6,11 +6,11 @@
   </head>
   <body>
     <div id="gui" class='hide' >&nbsp;
-      <span id="skipIntro">true</span>
+      <span id="skipIntro">false</span>
     </div>
 
     <div id='clubnode' class='show'>
-      <canvas id="clubnode-canvas" width="800" height="300"></canvas>
+      <canvas id="clubnode-canvas" width="900" height="300"></canvas>
     </div>
     <label for='mp3file' class="mp3player hide">File</label>
     <select id="mp3file" class="mp3player hide">
@@ -46,6 +46,9 @@
       <div id='current-time'>&nbsp;</div>
     </div>
 
-    <script type='text/javascript' src='/js/clubnode.js' ></script>
+    <script type='text/javascript' src='/js/utils.js' ></script>
+    <script type='text/javascript' src='/js/startup.js' ></script>
+    <script type='text/javascript' src='/js/renderstate.js' ></script>
+    <script type='text/javascript' src='/js/mp3player.js' ></script>
   </body>
 </html>
