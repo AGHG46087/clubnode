@@ -10,7 +10,7 @@ Club Node is a music visualizer that cycles through various different visualizat
 
 ### How do I get set up? ###
 
-* By default the introduction screen is enabled. To enable the introduction screen modify the HTML.  `<span id="skipIntro">false</span>`
+* By default the introduction screen is enabled. To disable the introduction screen modify the HTML.  `<span id="skipIntro">false</span>`
 
 * Download the repository:
 * Add your own music files to the `/music` directory (not inlcuded here for muisic licensing reasons).  I typically have them named in the format of `Artist_SongName.mp3`.  the application will handle the rest
