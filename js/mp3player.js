@@ -24,6 +24,7 @@ var mp3player = {
     patterns: [],
     patternIndex: 3,
     patternInterval: 0,
+    patternSquenceMillis: 10000,
     connection: null,
     PATTERN_CYCLE_ALL: true,
     PATTERN_START_INDEX: 0, // max is patterns.length -1
@@ -61,7 +62,7 @@ var mp3player = {
                 mp3player.patternIndex = mp3player.PATTERN_START_INDEX;
             }
             mp3player.toggleCanvasOrientation();
-        }, 3000);
+        }, mp3player.patternSquenceMillis);
     },
     /* loadMp3File: When a mp3 is being loaded this will load a audio file, setup event listeners, and connect analyser */
     loadMp3File: function(url) {
