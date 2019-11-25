@@ -61,29 +61,29 @@ div#mp3connect {
 }
 
 body > section {
-  display: flex;
   -webkit-display: -webkit-flex;
+  display: grid; /* table, table-row-group */
 
-  flex-direction: column;
   -webkit-flex-direction: column;
+  flex-direction: column;
 
-  justify-content: center;
   -webkit-justify-content: center;
+  justify-content: center;
 
-  align-content: center;
   -webkit-align-content: center;
+  align-content: center;
 
-  align-items: center;
   -webkit-align-items: center;
+  align-items: center;
 
-  box-sizing: border-box;
   height: 100%;
+  box-sizing: border-box;
 
-  perspective: 800px;
   -webkit-perspective: 800px;
+  perspective: 800px;
 
-  transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
 }
 #loadMsg {
   color: aquamarine;
@@ -98,16 +98,16 @@ section {
 }
 
 section > * {
-  display: flex;
-  -webkit-display: -webkit-flex;
-  align-items: center;
+  display: grid;
+    
   -webkit-align-items: center;
+  align-items: center;
 }
 
 section .fft {
   position: absolute;
-  box-reflect: below 5px linear-gradient(top, transparent, transparent 50%, rgba(255, 255, 255, 0.4));
   -webkit-box-reflect: below 5px -webkit-linear-gradient(top, transparent, transparent 50%, rgba(255, 255, 255, 0.4));
+  box-reflect: below 5px linear-gradient(top, transparent, transparent 50%, rgba(255, 255, 255, 0.4));
 }
 
 section.outline .fft {
@@ -115,18 +115,18 @@ section.outline .fft {
 }
 
 #fft1 {
-  transform: translateX(-350px) rotateX(-35deg) rotateY(30deg);
   -webkit-transform: translateX(-350px) rotateX(-35deg) rotateY(30deg);
+  transform: translateX(-350px) rotateX(-35deg) rotateY(30deg);
 }
 
 #fft2 {
-  transform: translateX(-530px) rotateX(-35deg) rotateY(-30deg);
   -webkit-transform: translateX(-530px) rotateX(-35deg) rotateY(-30deg);
+  transform: translateX(-530px) rotateX(-35deg) rotateY(-30deg);
 }
 
 #mp3gui.flat #fft1, #mp3gui.flat section {
+  -webkit-transform: inherit; 
   transform: inherit;
-  -webkit-transform: inherit;
   position: inherit;
   margin: 0 auto;
 }
